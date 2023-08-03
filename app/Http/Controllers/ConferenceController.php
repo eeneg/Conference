@@ -74,11 +74,11 @@ class ConferenceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Conference $conference)
     {
-        $conf = Conference::find($id);
-
-        return Inertia::render('Conferences/Show', $conf);
+        return Inertia::render('Conferences/Show', [
+            'conference' => $conference
+        ]);
     }
 
     /**

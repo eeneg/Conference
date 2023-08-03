@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import Pagination from '@/Components/Pagination.vue'
 import TextInput from '@/Components/TextInput.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -151,7 +151,11 @@ const formatDate = (date) => {
                             </thead>
                             <tbody class="divide-slate-700">
                                 <tr v-for="conf in props.finished.data">
-                                    <td class="p-2 text-center border-b border-slate-100">{{conf.title}}</td>
+                                    <td class="p-2 text-center border-b border-slate-100">
+                                        <Link :href="route('conferences.show', conf.id)">
+                                            {{conf.title}}
+                                        </Link>
+                                    </td>
                                     <td class="p-2 text-center border-b border-slate-100">{{conf.date}}</td>
                                     <td class="p-2 text-center border-b border-slate-100">Minutes</td>
                                     <td class="p-2 text-center border-b border-slate-100">
