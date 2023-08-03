@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Attachment;
+use App\Actions\SaveAttachments;
 use App\Models\Conference;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Throwable;
 
@@ -63,12 +62,9 @@ class ConferenceController extends Controller
 
         }
 
-        $attachments = Conference::fileHandle($request->attachments, $request->title, $conf->id);
+        app(SaveAttachments::class) ($request->attachments, $request->title, $conf->id);
 
-        $attachments = Attachment::create([
-            'conference_id' => $conf->id,
-            'files' => $attachments
-        ]);
+        return redirect()->back();
     }
 
     /**
