@@ -9,7 +9,9 @@ class SaveAttachments
 {
     public function __invoke($attachments, $title, $conference): Attachment
     {
-        $attachments = collect($attachments)->map(function($file) use ($title){
+        $sluggedTitle = str($title)->slug();
+
+        $attachments = collect($attachments)->map(function($file) use ($sluggedTitle){
             @[$category, $files] = $file;
 
             if (empty($files)) {
@@ -19,12 +21,13 @@ class SaveAttachments
                 ];
             }
 
+            $sluggedCategory = str($category)->slug();
+
             return [
                 'category' => $category,
                 'files' => collect($files)
                     ->filter(fn ($file) => is_file($file))
-                    ->each(fn ($file) => Storage::putFileAs(str("public/$title/$category")->slug(), $file, str($file->getClientOriginalName())->slug()))
-                    ->map(fn ($file) => ['path' => str("$title/$category")->slug(), 'fileName' => str($file->getClientOriginalName())->slug()])
+                    ->map(fn ($file) => ['path' => substr(Storage::putFile("public/attachments/$sluggedTitle/$sluggedCategory", $file), 7), 'fileName' => $file->getClientOriginalName()])
                     ->toArray()
             ];
         });
