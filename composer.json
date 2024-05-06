@@ -20,8 +20,6 @@
         "meilisearch/meilisearch-php": "^1.2",
         "predis/predis": "^2.2",
         "pusher/pusher-php-server": "^7.2",
-        "spiral/roadrunner-cli": "^2.6",
-        "spiral/roadrunner-http": "^3.5",
         "symfony/process": "^7.0.4",
         "tightenco/ziggy": "^2.0.4"
     },

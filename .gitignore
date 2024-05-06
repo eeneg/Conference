@@ -22,3 +22,7 @@ package-lock.json
 /meili_data
 rr
 .rr.yaml
+
+/caddy
+frankenphp
+frankenphp-worker.php
