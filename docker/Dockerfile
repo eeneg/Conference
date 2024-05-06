@@ -60,7 +60,6 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY php.ini /etc/php/8.2/cli/conf.d/99-sail.ini
 RUN chmod +x /usr/local/bin/start-container
 
-RUN mv "/etc/php/8.2/cli/php.ini-production" "/etc/php/8.2/cli/php.ini"
 COPY . /app/public
 
 EXPOSE 8000
