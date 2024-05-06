@@ -25,8 +25,6 @@ services:
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
         volumes:
             - '.:/var/www/html'
-            - caddy_data:/data
-            - caddy_config:/config
         networks:
             - conference
         depends_on:
