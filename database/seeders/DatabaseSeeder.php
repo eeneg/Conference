@@ -16,16 +16,16 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         \App\Models\User::factory()->create([
-            'name' => 'test',
-            'email' => 'test@example.com',
-            'password' => Hash::make('zxczxczxc')
+            'name' => 'admin',
+            'email' => 'admin@base.com',
+            'password' => Hash::make('12345678')
         ]);
 
-        \App\Models\User::factory()->create([
-            'name' => 'test1',
-            'email' => 'test1@example.com',
-            'password' => Hash::make('zxczxczxc')
-        ]);
+        // \App\Models\User::factory()->create([
+        //     'name' => 'test1',
+        //     'email' => 'test1@example.com',
+        //     'password' => Hash::make('zxczxczxc')
+        // ]);
 
         \App\Models\Role::create([
             'title' => 'administrator'
@@ -36,52 +36,52 @@ class DatabaseSeeder extends Seeder
         ]);
 
         \App\Models\Storage::create([
-            'title' => 'Sample Storage Title',
-            'location' => 'Sample Storage Location',
-            'details' => 'Sample Storage Details'
+            'title' => 'Cabinet 1',
+            'location' => 'Please Edit Location',
+            'details' => 'Please Edit Details'
         ]);
 
-        \App\Models\Storage::create([
-            'title' => 'Sample Storage Title 1',
-            'location' => 'Sample Storage Location 1',
-            'details' => 'Sample Storage Details 1'
-        ]);
+        // \App\Models\Storage::create([
+        //     'title' => 'Sample Storage Title 1',
+        //     'location' => 'Sample Storage Location 1',
+        //     'details' => 'Sample Storage Details 1'
+        // ]);
 
         \App\Models\Category::create([
-            'title' => 'Sample Category Title 1',
+            'title' => 'Ordinance',
             'type' => '1',
-            'details' => 'Sample Category Details 1'
+            'details' => 'Ordinance Files (Edit as you see fit)'
         ]);
 
-        \App\Models\Category::factory()->count(10)->create();
+        // \App\Models\Category::factory()->count(10)->create();
 
         \App\Models\Category::create([
             'title' => 'Resolutions',
             'type' => '1',
-            'details' => 'Sample Resolution Details'
+            'details' => 'Resolution Files (Edit as you see fit)'
         ]);
 
-        \App\Models\Category::create([
-            'title' => 'Ordinances',
-            'type' => '1',
-            'details' => 'Sample Ordinance Details'
-        ]);
+        // \App\Models\Category::create([
+        //     'title' => 'Ordinances',
+        //     'type' => '1',
+        //     'details' => 'Sample Ordinance Details'
+        // ]);
 
         \App\Models\Category::create([
-            'title' => 'Sample Category Title 2',
+            'title' => 'DILG Public Opinions',
             'type' => '2',
-            'details' => 'Sample Category Details 2'
+            'details' => 'DILG Public Opinion Files (Edit as you see fit)'
         ]);
 
         \App\Models\Role::create([
             'title' => 'board member'
         ]);
 
-        User::where('email', 'test@example.com')->first()->roles()->attach(Role::where('title', 'administrator')->first()->id);
-        User::where('email', 'test1@example.com')->first()->roles()->attach(Role::where('title', 'administrator')->first()->id);
+        User::where('email', 'admin@base.com')->first()->roles()->attach(Role::where('title', 'administrator')->first()->id);
+        // User::where('email', 'test1@example.com')->first()->roles()->attach(Role::where('title', 'administrator')->first()->id);
 
 
-        \App\Models\User::factory()->count(90)->hasAttached(\App\Models\Role::where('title', 'user')->first())->create();
-        \App\Models\User::factory()->count(10)->hasAttached(\App\Models\Role::where('title', 'board member')->first())->create();
+        // \App\Models\User::factory()->count(90)->hasAttached(\App\Models\Role::where('title', 'user')->first())->create();
+        // \App\Models\User::factory()->count(10)->hasAttached(\App\Models\Role::where('title', 'board member')->first())->create();
     }
 }
