@@ -260,7 +260,7 @@ onMounted(() => {
             </div>
 
             <!-- poll modal -->
-            <Poll v-if="showPollModal" :show="showPollModal" :pollID="pollID" :initiatorID="initiatorID"/>
+            <Poll v-if="showPollModal" :show="showPollModal" :pollID="pollID" :initiatorID="initiatorID" :viewing="false"/>
 
             <PollResult @close="closeResModal($event)" v-if="showPollResultModal" :showModal="showPollResultModal" :poll="poll"/>
 

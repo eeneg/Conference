@@ -6,13 +6,13 @@ import InputError from '../InputError.vue';
 import InputLabel from '../InputLabel.vue';
 import TextInput from '../TextInput.vue';
 import ResponseModal from '../ResponseModal.vue';
-import { PencilIcon, TrashIcon, PlayIcon } from '@heroicons/vue/20/solid';
+import { PencilIcon, TrashIcon, PlayIcon, EyeIcon } from '@heroicons/vue/20/solid';
 import { useForm, usePage } from '@inertiajs/vue3';
 import { onMounted,ref,defineExpose  } from 'vue';
 
 const props = defineProps({showPollListModal:Boolean,conference_id:String})
 
-const emit = defineEmits(['closePollListModal', 'openEditPollModalEmit'])
+const emit = defineEmits(['closePollListModal', 'openEditPollModalEmit', 'openPollModal'])
 
 const header = ref('')
 const message = ref('')
@@ -85,6 +85,10 @@ const deletePoll = (id) => {
 //edit
 const openEditPollModal = (e) => {
     emit('openEditPollModalEmit', e)
+}
+
+const viewPollModal = (e) => {
+    emit('openPollModal', e)
 }
 
 //start poll
@@ -161,6 +165,11 @@ window.Echo.private('poll-result').listen('PollConcludedEvent', (e) => {
                         {{ poll.concluded == false ? 'Unconcluded' : 'Concluded' }}
                     </div>
                     <div class="flex items-center justify-center float-right p-2">
+                        <button @click="viewPollModal(poll.id)">
+                            <div class="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-300 text-red-900 mr-1">
+                                <EyeIcon class="w-3 h-3 fill-black " aria-hidden="true" />
+                            </div>
+                        </button>
                         <button @click="openVotingPollModal(poll.id, poll.concluded)">
                             <div class="flex h-5 w-5 items-center justify-center rounded-full bg-green-400 hover:bg-green-300 text-red-900 mr-1">
                                 <PlayIcon class="w-3 h-3 fill-black " aria-hidden="true" />

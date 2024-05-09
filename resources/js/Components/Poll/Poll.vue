@@ -9,7 +9,9 @@ import InputError from '@/Components/InputError.vue';
 import { onMounted } from 'vue';
 import axios from 'axios';
 
-const props = defineProps({showPollModal:Boolean, pollID:String, initiatorID:String})
+const props = defineProps({showPollModal:Boolean, pollID:String, initiatorID:String, viewing:Boolean})
+
+const emits = defineEmits(['closeViewingPollModal']);
 
 const user_id = usePage().props.auth.user.id;
 
@@ -139,6 +141,10 @@ const endPoll = () => {
     })
 }
 
+const closeViewingPollModal = () => {
+    emits('closeViewingPollModal')
+}
+
 onMounted(() => {
     getPoll()
     getPollCount()
@@ -169,10 +175,10 @@ onMounted(() => {
             </p>
 
             <div class="mt-3 space-y-3">
-                <div class="border p-6 rounded shadow border-l-8 border-green-400 hover:border-2 hover:border-l-8" @click="setValue(true)">
+                <div class="border p-6 rounded shadow border-l-8 border-green-400 hover:border-2 hover:border-l-8" @click="props.viewing ? '' : setValue(true)">
                     <div class="flex">
                         <div class="grow">
-                            <input  type="radio" class="" id="yes" v-if="!initiator" v-model="pollForm.vote" :value="true" name="selection"></input>
+                            <input  type="radio" class="" id="yes" v-if="!initiator && props.viewing == false" v-model="pollForm.vote" :value="true" name="selection"></input>
                             <label for="yes" class="ml-2">YES</label>
                         </div>
                         <div class="text-green-400 text-xl" v-if="percentage == 1 || percentage == 3">
@@ -185,10 +191,10 @@ onMounted(() => {
                         </div>
                     </div>
                 </div>
-                <div class="border p-6 rounded shadow border-l-8 border-red-400 hover:border-2 hover:border-l-8" @click="setValue(false)">
+                <div class="border p-6 rounded shadow border-l-8 border-red-400 hover:border-2 hover:border-l-8" @click="props.viewing ? '' : setValue(true)">
                     <div class="flex">
                         <div class="grow">
-                            <input type="radio" class="" id="no" v-if="!initiator" v-model="pollForm.vote" :value="false" name="selection"></input>
+                            <input type="radio" class="" id="no" v-if="!initiator && props.viewing == false" v-model="pollForm.vote" :value="false" name="selection"></input>
                             <label for="no" class="ml-2">NO</label>
                         </div>
                         <div class="text-red-400 text-xl" v-if="percentage == 2 || percentage == 3">
@@ -241,8 +247,11 @@ onMounted(() => {
                 <SecondaryButton class="w-full justify-center" @click="closeModal" v-if="initiator">Cancel Poll</SecondaryButton>
                 <PrimaryButton class="w-full justify-center" @click="endPoll" v-if="initiator">Conclude Poll</PrimaryButton>
             </div>
-            <div class="mt-3" v-if="!initiator">
+            <div class="mt-3" v-if="!initiator && props.viewing == false">
                 <PrimaryButton class="w-full justify-center" @click="submitPollResponse">{{sbmtBtnTxt}}</PrimaryButton>
+            </div>
+            <div class="mt-3" v-if="!initiator && props.viewing != false">
+                <PrimaryButton class="w-full justify-center" @click="closeViewingPollModal()">Close</PrimaryButton>
             </div>
         </div>
     </Modal>
