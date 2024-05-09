@@ -14,6 +14,7 @@ import PollResult from '@/Components/PollResult.vue';
 const showingNavigationDropdown = ref(false);
 
 const role = usePage().props.auth.role;
+const user_id = usePage().props.auth.user.id;
 
 const showPollModal = ref(false)
 const pollID = ref(null)
@@ -47,9 +48,11 @@ const getNewMessageCount = () => {
 }
 
 const openPollModal = (e) => {
-    showPollModal.value = e.value
     pollID.value = e.poll_id
     initiatorID.value = e.initiatorID
+    if(role == 'board member' || initiatorID.value == user_id){
+        showPollModal.value = e.value
+    }
     if(showPollModal.value == true){
         showPollResultModal.value = false
     }
