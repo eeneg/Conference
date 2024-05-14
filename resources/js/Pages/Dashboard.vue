@@ -3,6 +3,7 @@ import { Head, useForm } from '@inertiajs/vue3';
 import { UserGroupIcon, DocumentTextIcon, FolderIcon, BuildingLibraryIcon, ArrowTopRightOnSquareIcon } from '@heroicons/vue/20/solid';
 import moment from 'moment';
 import _ from 'lodash';
+import { ref } from 'vue';
 
 const props = defineProps({
         user_count:Number,
@@ -12,8 +13,14 @@ const props = defineProps({
         sesssions_today:Object,
         files_review:Object,
         monthly_sessions:Object,
-        year: Number
-    })
+        year: String
+})
+
+const prompt = ref(false)
+
+const showOnInput = () => {
+    prompt.value = true
+}
 
 const form = useForm({
     year: props.year ?? moment().format('Y')
@@ -22,7 +29,7 @@ const form = useForm({
 const submit = () => {
     form.submit('get', route('dashboard'), form, {
         onSuccess: () => {
-
+            prompt.value = false
         },
         onError: (e) => {
             console.log(e)
@@ -121,8 +128,9 @@ const submit = () => {
                                 Conferences
                             </p>
                         </div>
-                        <div>
-                            <input @change="submit" v-model="form.year" type="number" min="1900" max="2099" step="1" value="2024" class="rounded h-8"/>
+                        <div class="flex space-x-2">
+                            <small v-if="prompt" class="text-red-600">Press Enter</small>
+                            <input @keyup.enter="submit()" @keyup.delete="showOnInput()" @change="submit" v-model="form.year" type="number" min="1900" max="2099" step="1" value="2024" class="rounded h-8"/>
                         </div>
                     </div>
                     <div class="flex justify-center h-60">
