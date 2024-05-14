@@ -21,7 +21,7 @@ class DashboardController extends Controller
             'sesssions_today' => Conference::whereDate('date', Carbon::now()->format('Y-m-d'))->where('status', 'pending')->get(),
             'files_review' => File::where('for_review', true)->get(),
             'monthly_sessions' =>  Conference::where('status', 'completed')->get()->groupBy(function($item, int $key) {
-                return Carbon::parse($item->date)->format('F');
+                return Carbon::parse($item->date)->format('M');
             })->map(function($e){
                 return count($e);
             })

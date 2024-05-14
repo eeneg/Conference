@@ -132,7 +132,7 @@ class PollController extends Controller
             ->leftJoin('users', 'users.id', '=', 'poll_votes.user_id')
             ->select('users.name')
             ->get();
-        
+
         $poll_no = PollVote::where('poll_id', $poll_id)
             ->where('vote', false)
             ->leftJoin('users', 'users.id', '=', 'poll_votes.user_id')
