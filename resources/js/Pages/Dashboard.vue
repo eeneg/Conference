@@ -111,9 +111,9 @@ const props = defineProps({
                                 </div>
                             </div>
                             <div class="flex flex-col flex-col-reverse align-bottom pl-4 pr-4 text-center pt-6 h-60">
-                                <div 
+                                <div
                                     class="relative bg-indigo-200"
-                                    :class="'h-['+Math.round((monthly_sessions[moment().month(i-1).format('MMM')]/30)*100)+'%]'" 
+                                    :style="`height: ${Math.round((monthly_sessions[moment().month(i-1).format('MMM')]/30)*100)}%;`"
                                 >
                                     <span class="absolute bottom-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-bold">
                                         {{

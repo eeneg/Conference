@@ -51,10 +51,10 @@ defineProps({
             </div>
 
              <!-- Features Section -->
-             <section class="py-20 text-white">
+             <section class="py-20 dark:text-white light:text-black">
                 <div class="container mx-auto px-4">
                     <div class="max-w-4xl mx-auto text-center p-6">
-                        <h1 class="text-4xl font-bold mb-6 text-white">
+                        <h1 class="text-4xl font-bold mb-6">
                             PAPERLESS CONFERENCE AND FILE MANAGEMENT SYSTEM
                         </h1>
                     </div>
@@ -63,11 +63,11 @@ defineProps({
 
 
             <!-- Features Section -->
-            <section class="py-20 bg-hero text-white">
+            <section class="py-20 bg-hero light:text-white light:text-black">
                 <div class="container mx-auto px-4">
                     <div class="max-w-4xl mx-auto text-center bg-slate-200 p-6 rou opacity-75 rounded">
-                        <h1 class="text-4xl font-bold mb-6 text-black">Go Paperless with Ease</h1>
-                        <p class="text-lg mb-8 text-black">Efficiently manage your sessions and files with our minimalist platform.</p>
+                        <h1 class="text-4xl font-bold mb-6">Go Paperless with Ease</h1>
+                        <p class="text-lg mb-8">Efficiently manage your sessions and files with our minimalist platform.</p>
                     </div>
                 </div>
             </section>
@@ -76,7 +76,7 @@ defineProps({
             <section class="py-20">
                 <div class="container mx-auto px-4">
                     <div class="max-w-4xl mx-auto text-center">
-                        <h2 class="text-3xl font-bold mb-10 text-white">Key Features</h2>
+                        <h2 class="text-3xl font-bold mb-10 dark:text-white light:text-black">Key Features</h2>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                             <div class="p-4 border rounded-md shadow-md bg-white">
                                 <h3 class="text-xl font-semibold mb-4">Efficient Session Management</h3>
