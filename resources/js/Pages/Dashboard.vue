@@ -1,5 +1,5 @@
 <script setup>
-import { Head } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 import { UserGroupIcon, DocumentTextIcon, FolderIcon, BuildingLibraryIcon, ArrowTopRightOnSquareIcon } from '@heroicons/vue/20/solid';
 import moment from 'moment';
 import _ from 'lodash';
@@ -11,9 +11,24 @@ const props = defineProps({
         conference_count:Number,
         sesssions_today:Object,
         files_review:Object,
-        monthly_sessions:Object
+        monthly_sessions:Object,
+        year: Number
     })
 
+const form = useForm({
+    year: props.year ?? moment().format('Y')
+})
+
+const submit = () => {
+    form.submit('get', route('dashboard'), form, {
+        onSuccess: () => {
+
+        },
+        onError: (e) => {
+            console.log(e)
+        }
+    })
+}
 </script>
 
 <template>
@@ -100,8 +115,15 @@ const props = defineProps({
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="flex flex-col px-6 pt-6 pb-3 text-gray-900">
-                    <div class="text-lg font-bold">
-                        Conferences
+                    <div class="text-lg font-bold flex justify-between">
+                        <div>
+                            <p>
+                                Conferences
+                            </p>
+                        </div>
+                        <div>
+                            <input @change="submit" v-model="form.year" type="number" min="1900" max="2099" step="1" value="2024" class="rounded h-8"/>
+                        </div>
                     </div>
                     <div class="flex justify-center h-60">
                         <div class="flex flex-col flex-col-reverse text-center" v-for="i in 12">
