@@ -12,11 +12,10 @@
     import Dropdown from '@/Components/Dropdown.vue';
     import DropdownLink from '@/Components/DropdownLink.vue';
     import FileComments from '@/Components/FileComments.vue';
-    import { ArrowDownTrayIcon, DocumentIcon, BookOpenIcon, EllipsisVerticalIcon, EyeIcon, ChatBubbleBottomCenterIcon, CheckIcon } from '@heroicons/vue/20/solid';
+    import { ArrowDownTrayIcon, DocumentIcon, EllipsisVerticalIcon, EyeIcon, CheckIcon } from '@heroicons/vue/20/solid';
     import { useForm } from '@inertiajs/vue3';
     import { ref } from 'vue';
     import { router } from '@inertiajs/vue3'
-    import Pagination from '@/Components/Pagination.vue';
     import axios from 'axios';
     import _ from 'lodash';
 
@@ -39,7 +38,9 @@
     var success = true
     var message = ""
 
-    const confirmingFileDeletion = ref(false)
+    const closeResModal = () => {
+        responseModal.value = false
+    }
 
     const form = useForm({
         search: props.search,
@@ -172,6 +173,57 @@
     const reloadLatest = (e) => {
         search()
     }
+
+    const confirmingFileDeletion = ref(false)
+    const deleteFileForm = useForm({
+        password: null,
+        file_id: null,
+        safe: false
+    })
+    const deleteFile = (id) => {
+        axios.get(route('file.check', id))
+        .then(({data}) => {
+            deleteFileForm.file_id = id
+            if(data == false){
+                confirmingFileDeletion.value = true
+                deleteFileForm.safe = false
+            }else{
+                deleteFileForm.safe = true
+                deleteForeverModalOpen()
+            }
+        })
+        .catch(e => {
+
+        })
+    }
+    const closeFileDeleteModal = () => {
+        confirmingFileDeletion.value = false
+    }
+    const deleteFileConfirmed = () => {
+        deleteFileForm.submit('delete', route('files.destroy', deleteFileForm.file_id),{
+            preserveScroll: true,
+            onSuccess: (e) => {
+                header = 'Success'
+                message = 'File Deleted Successfully'
+                success = true
+                responseModal.value = true
+                confirmingFileDeletion.value = false
+                files.value = e.props.files
+                closeDeleteForeverModal()
+            },
+            onError: (e) => {
+                console.log(e)
+            }
+        })
+    }
+
+    const deleteForeverModal = ref(false)
+    const deleteForeverModalOpen = () => {
+        deleteForeverModal.value = true
+    }
+    const closeDeleteForeverModal = () => {
+        deleteForeverModal.value = false
+    }
 </script>
 <template>
 
@@ -243,7 +295,7 @@
                         <div class="border rounded p-2 pl-2 mt-2 group bg-indigo-100" v-for="(file, i) in for_review">
                             <div class="flex items-center">
                                 <div class="flex items-center p-1 justify-center sm:text-sm">
-                                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-300 text-red-900">
+                                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-300 text-red-900">
                                         <DocumentIcon class="w-5 h-5 stroke-gray-900 fill-none " aria-hidden="true" />
                                     </div>
                                 </div>
@@ -260,17 +312,17 @@
                                         <FileVersioncontrol @refreshData="reloadLatest($event)" :file_id="file.id"/>
                                     </div>
                                     <a class="hidden group-hover:block" :href="route('file.download',{ id:file.id })">
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-red-900">
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-red-900">
                                             <ArrowDownTrayIcon class="w-5 h-5 stroke-gray-900 fill-black " aria-hidden="true" />
                                         </div>
                                     </a>
                                     <button class="hidden group-hover:block" @click="viewFile(file)">
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
                                             <EyeIcon class="w-5 h-5 fill-black aria-hidden" aria-hidden="true" />
                                         </div>
                                     </button>
                                     <button class="" @click="endForReview(file.id)">
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
                                             <CheckIcon class="w-5 h-5 fill-black aria-hidden" aria-hidden="true" />
                                         </div>
                                     </button>
@@ -279,7 +331,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="grow pl-5 pr-5 pb-20 text-sm min-h-20 max-h-screen overflow-auto" @scroll="onScroll" group="file">
+                <div class="grow pl-5 pr-5 pb-40 text-sm min-h-20 max-h-screen overflow-auto" @scroll="onScroll" group="file">
                     <div>
                         <h2 class="text-lg font-bold">Files</h2>
                         <hr>
@@ -287,7 +339,7 @@
                     <div class="border rounded pr-2 pl-2 mt-2 group" v-for="(file, i) in files.data">
                         <div class="flex">
                             <div class="flex items-center p-1 justify-center sm:text-sm">
-                                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-300 text-red-900">
+                                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-300 text-red-900">
                                     <DocumentIcon class="w-5 h-5 stroke-gray-900 fill-none " aria-hidden="true" />
                                 </div>
                             </div>
@@ -313,20 +365,20 @@
                                         <FileVersioncontrol @refreshData="reloadLatest($event)" :file_id="file.id"/>
                                     </div>
                                     <a class="hidden group-hover:block" :href="route('file.download',{ id:file.id })">
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-red-900">
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-red-900">
                                             <ArrowDownTrayIcon class="w-5 h-5 stroke-gray-900 fill-black " aria-hidden="true" />
                                         </div>
                                     </a>
                                     <button class="hidden group-hover:block" @click="viewFile(file)">
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
                                             <EyeIcon class="w-5 h-5 fill-black aria-hidden" aria-hidden="true" />
                                         </div>
                                     </button>
 
-                                    <Dropdown align="right" width="48">
+                                    <Dropdown class="absolute" align="right" width="48">
                                         <template #trigger>
                                             <button>
-                                                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
+                                                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
                                                     <EllipsisVerticalIcon class="w-5 h-5 fill-black aria-hidden" aria-hidden="true" />
                                                 </div>
                                             </button>
@@ -339,6 +391,9 @@
                                                 </li>
                                                 <li>
                                                     <div class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer" @click="openRenameModal(file.id, file.file_name, i)">Rename</div>
+                                                </li>
+                                                <li>
+                                                    <div class="block w-full px-4 py-2 text-left text-sm leading-5 text-red-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer" @click="deleteFile(file.id)">Delete</div>
                                                 </li>
                                             </ul>
                                         </template>
@@ -387,7 +442,7 @@
 
             <SecondaryButton
                 class="w-full mt-2 place-content-center bg-red-400"
-                @click="closeModal">
+                @click="closeResModal">
                             <p>OK</p>
             </SecondaryButton>
         </div>
@@ -417,6 +472,66 @@
             <div class="mt-6 flex space-x-2 justify-end">
                 <SecondaryButton @click="closeRenameModal"> Cancel </SecondaryButton>
                 <PrimaryButton @click="submitRename">Save</PrimaryButton>
+            </div>
+        </div>
+    </Modal>
+
+    <Modal :show="deleteForeverModal" @close="closeDeleteForeverModal">
+        <div class="p-6">
+            <h2 class="text-lg font-medium text-gray-900">
+                Delete File Forever!
+            </h2>
+
+            <p class="mt-1 text-sm text-gray-600">
+                This file will be deleted forever and you wont be able to restore it.
+            </p>
+
+            <div class="mt-6 flex space-x-2 justify-end">
+                <SecondaryButton @click="closeDeleteForeverModal()"> Cancel </SecondaryButton>
+                <DangerButton @click="deleteFileConfirmed()">Delete Forever</DangerButton>
+            </div>
+        </div>
+    </Modal>
+
+    <Modal :show="confirmingFileDeletion" @close="closeFileDeleteModal">
+        <div class="p-6">
+            <h2 class="text-lg font-medium text-gray-900">
+                This file is from a previous conference and has older versions. <br>
+                Are you sure you want to delete it?
+            </h2>
+            <br>
+            <p class="mt-1 text-sm text-gray-600">
+                Once deleted, all resources and file versions will be permanently removed and no longer viewable in the conference view.
+                Please enter your password to confirm deletion.
+            </p>
+
+            <div class="mt-6">
+                <InputLabel for="password" value="Password" class="sr-only" />
+
+                <TextInput
+                    id="password"
+                    ref="passwordInput"
+                    v-model="deleteFileForm.password"
+                    type="password"
+                    class="mt-1 block w-3/4"
+                    placeholder="Password"
+                    @keyup.enter="deleteFileConfirmed"
+                />
+
+                <InputError :message="deleteFileForm.errors.password" class="mt-2" />
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <SecondaryButton @click="closeFileDeleteModal"> Cancel </SecondaryButton>
+
+                <DangerButton
+                    class="ml-3"
+                    :class="{ 'opacity-25': deleteFileForm.processing }"
+                    :disabled="deleteFileForm.processing"
+                    @click="deleteFileConfirmed"
+                >
+                    Delete File
+                </DangerButton>
             </div>
         </div>
     </Modal>

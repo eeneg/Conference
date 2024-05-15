@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Storage;
 use App\Models\Category;
 use App\Models\File;
+use App\Models\Attachment;
 use App\Models\FileVersionControl;
 use App\Services\FileContentService;
 use App\Services\FileUploadedService;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage as FileStorage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\File as FileValidate;
+use Illuminate\Support\Facades\Redirect;
 use Exception;
 use Throwable;
 
@@ -47,24 +49,6 @@ class FileController extends Controller
     public function create()
     {
         //
-    }
-
-    public function fileCheck(Request $request){
-
-        $existing_file_names = [];
-
-        foreach($request->fileNames as $file){
-            $check = File::where('storage_id', $request->storage_id)->where('category_id', $request->category_id)->where('file_name', str_replace(' ','_',$file))->count() > 0;
-            if($check){
-                array_push($existing_file_names, $file);
-            }
-        }
-
-        if(count($existing_file_names) > 0){
-            return ['response' => 'Duplicate File Names Inside Storage', 'file_names' => $existing_file_names, 'check' => true];
-        }else{
-            return ['check' => false];
-        }
     }
 
     /**
@@ -179,34 +163,47 @@ class FileController extends Controller
         return redirect(route('file.index'));
     }
 
+    public function checkFile(String $id) {
+        $fv = FileVersionControl::where('control_id', FileVersionControl::where('file_id', $id)->first()->control_id)->get()->count();
+        $at = Attachment::where('file_id', $id)->get()->count();
+
+        return $fv == 1 && $at == 0;
+    }
+
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
-        // $f = File::find($id);
+        $f = File::find($id);
 
-        // $fv = FileVersionControl::where('file_id', $id)->first();
+        if(!$request->safe){
+            $request->validate([
+                'password' => ['required', 'current-password'],
+            ]);
+        }
 
-        // if($fv){
-        //     $fv->delete();
-        // }
 
-        // if(count(FileStorage::files('public/File_Uploads/'.$f->storage_id)) == 1){
-        //     FileStorage::deleteDirectory('public/File_Uploads/'.$f->storage_id);
-        // }else{
-        //     FileStorage::delete($f->path);
-        // }
+        $fv = FileVersionControl::where('file_id', $id)->first();
 
-        // $f->category()->detach();
+        if(FileVersionControl::where('control_id', FileVersionControl::where('file_id', $id)->first()->control_id)->get()->count() > 1 && $f->latest == true){
+            $this->deleteAllFileVersions->handle($id);
+        }else{
+            $fv->delete();
+        }
 
-        // $f->pdfContent()->delete();
+        if(count(FileStorage::files('public/File_Uploads/'.$f->storage_id)) == 1){
+            FileStorage::deleteDirectory('public/File_Uploads/'.$f->storage_id);
+        }else{
+            FileStorage::delete($f->path);
+        }
 
-        // $f->delete();
+        $f->category()->detach();
 
-        // if($f->latest == true){
-        //     $this->deleteAllFileVersions->handle($id);
-        // }
+        $f->pdfContent()->delete();
 
+        $f->delete();
+
+        return Redirect::route('file.index');
     }
 }

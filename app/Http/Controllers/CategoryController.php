@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Models\Category;
 use App\Models\File;
 use App\Models\FileCategory;
+use App\Models\Reference;
 
 class CategoryController extends Controller
 {
@@ -45,7 +46,9 @@ class CategoryController extends Controller
 
         $files = FileCategory::where('category_id', $id)->count() == 0;
 
-        return $files;
+        $ref = Reference::where('category_id', $id)->count() == 0;
+
+        return $files && $ref;
 
     }
 

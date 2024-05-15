@@ -68,9 +68,9 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::get('/storage_relation/{id}', [StorageController::class, 'checkStorageRelation'])->name('storage.check');
     Route::get('/category_check/{id}', [CategoryController::class, 'checkCategoryRelation'])->name('category.check');
 
-    Route::post('/file_check', [FileController::class, 'fileCheck'])->name('file.check');
     Route::patch('/file_rename/{id}', [FileController::class, 'renameFile'])->name('file.rename');
     Route::patch('/file_review/{id}', [FileController::class, 'setFileForReview'])->name('file.review');
+    Route::get('/file_check/{id}', [FileController::class, 'checkFile'])->name('file.check');
 
     Route::get('/fileList', [FileSearchController::class, 'index'])->name('file.index');
     Route::get('/fileSearch', [FileSearchController::class, 'searchFile'])->name('file.search');

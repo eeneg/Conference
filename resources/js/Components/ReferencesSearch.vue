@@ -67,14 +67,17 @@ const pdfModalShowClose = () => {
                     </div>
                 </div>
                 <div class="flex basis-1/2">
-                    <div class="ml-2">
+                    <div class="ml-2 pr-5">
                         <div>
-                            <p class="text-lg float-left">{{ref.file_name}}</p>
+                            <p class="text-lg float-left">{{ref.file_name }}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-400 float-left" :class="{'text-gray-600':i % 2 ===0}">{{ref.title}}</p>
+                            <p class="text-sm text-gray-400 float-left" :class="{'text-gray-600':i % 2 ===0}">{{ref.details}}</p>
                         </div>
                     </div>
+                </div>
+                <div class="flex justify-center items-center basis-1/2">
+                    {{ ref.title }}
                 </div>
                 <div class="flex justify-center items-center basis-1/2">
                     {{ref.date}}

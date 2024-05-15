@@ -18,12 +18,16 @@ class DeleteAllFileVersions {
             $files = File::whereIn('id', $file_versions)->get();
 
             foreach($files as $file){
+                $file->category()->detach();
+                $file->pdfContent()->delete();
                 FileStorage::delete($file->path);
             }
 
             if(count(FileStorage::files('public/File_Uploads/'.$files->first()->storage_id)) == 1){
                 FileStorage::deleteDirectory('public/File_Uploads/'.$f->storage_id);
             }
+
+            FileVersionControl::whereIn('file_id', $file_versions)->delete();
 
             File::whereIn('id', $file_versions)->delete();
         }
