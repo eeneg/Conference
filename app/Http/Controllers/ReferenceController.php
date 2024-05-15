@@ -87,7 +87,7 @@ class ReferenceController extends Controller
         return Reference::search($request->search)->paginate(10);
     }
 
-    public function destroy($id){
+    public function destroy(Request $request, String $id){
         $request->validate([
             'password' => ['required', 'current-password'],
         ]);

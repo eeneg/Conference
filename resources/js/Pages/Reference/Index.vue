@@ -129,7 +129,7 @@
             onError: () => {
                 edit.value = false
                 header = "Error!"
-                success = true
+                success = false
                 message = "Something went wrong!"
                 modalShow.value = true
             }
