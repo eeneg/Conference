@@ -88,6 +88,10 @@ class ReferenceController extends Controller
     }
 
     public function destroy($id){
+        $request->validate([
+            'password' => ['required', 'current-password'],
+        ]);
+
         $ref = Reference::find($id);
 
         Storage::delete('public/Reference_Files/' . $ref->category_id . '/' . $ref->file_name);
