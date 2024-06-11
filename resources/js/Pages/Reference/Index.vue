@@ -8,11 +8,12 @@
     import SecondaryButton from '@/Components/SecondaryButton.vue';
     import DangerButton from '@/Components/DangerButton.vue';
     import InputError from '@/Components/InputError.vue';
-    import Pagination from '@/Components/Pagination.vue';
-    import {ref} from  'vue';
+    import {nextTick, ref} from  'vue';
     import axios from 'axios';
+    import { EyeIcon } from '@heroicons/vue/20/solid';
+    import _ from 'lodash';
 
-    const props = defineProps({reference: Object, refrenceCategory: Object})
+    const props = defineProps({reference: Object, refrenceCategory: Object, refsearch: String, refcategory: String})
 
     const form = useForm({
         id: null,
@@ -23,6 +24,8 @@
         details: null
     })
 
+    const reference = ref(props.reference)
+
     const addCategoryForm = useForm({
         title: null,
         type: 2,
@@ -30,8 +33,6 @@
     })
 
     const addCategoryModal = ref(false)
-
-    var referenceList = ref(null)
 
     const formModal = ref(false)
 
@@ -75,7 +76,9 @@
                 header = "Success!"
                 success = true
                 message = "Reference Submitted Successfuly"
+                document.getElementById('file').value = null
                 modalShow.value = true
+                reference.value = props.reference
                 form.reset()
             },
             onError: () => {
@@ -180,7 +183,61 @@
         modalShow.value =  false
     }
 
+    const viewPDF = ref(false)
+    const pdfPath = ref(null)
+    const pdfTitle = ref(null)
+    const pdfDetails = ref(null)
+    const view = (i) => {
+        viewPDF.value = true
+        pdfPath.value = i.path
+        pdfTitle.value = i.title
+        pdfDetails.value = i. details
+    }
 
+    const closeView = () => {
+        viewPDF.value = false
+    }
+
+    const searchForm = useForm({
+        search: props.refsearch,
+        category_id: props.refcategory,
+        page: 1
+    })
+
+    const search = () => {
+        searchForm.page = 1
+        axios.post(route('reference.search'), searchForm)
+        .then(({data}) => {
+            reference.value = data
+            console.log(data)
+        })
+        .catch(e => {
+
+        })
+    }
+
+    const searchFileOnScroll = () => {
+        axios.post(route('reference.search'), searchForm)
+        .then(({data}) => {
+            if(data.data.length == 0){
+                searchForm.page = searchForm.page - 1
+            }
+            data.data.forEach(e => {
+                reference.value.data.push(e)
+            })
+            console.log(data)
+        })
+        .catch(e => {
+
+        })
+    }
+
+    const onScroll = _.debounce(({ target: { scrollTop, clientHeight, scrollHeight }}) => {
+        if (scrollTop + clientHeight >= scrollHeight) {
+            searchForm.page = searchForm.page + 1
+            searchFileOnScroll()
+        }
+    }, 300)
 
 </script>
 <template>
@@ -206,29 +263,62 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-3 mb-3 mr-3 pr-6 pl-5">
-                            <div class="flex w-full md:flex-row-reverse sm:flex-row-reverse">
-                                <select name="cat" v-model="referenceList" id="cat" class="border min-[300px]:w-full rounded text-gray-700 border-gray-300">
-                                    <option :value="null" selected>Select Reference Category</option>
-                                    <option :value="category.reference" v-for="category in props.reference">{{ category.title.charAt(0).toUpperCase() + category.title.slice(1) }}</option>
-                                </select>
-                            </div>
-                            <div class="basis-full p-2 mb-9 max-h-96 overflow-auto mt-3">
-                                <table class="w-full table-auto text-center">
+                        <div class="mt-3 mb-3 pr-6 pl-5">
+                            <form @submit.prevent="search">
+                                <div class="flex w-full space-x-2">
+                                    <div class="grow">
+                                        <div class="grow">
+                                            <InputLabel value="Search" for="search" />
+                                            <div class="relative rounded-md shadow-sm">
+                                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                                    <span class="text-gray-500 sm:text-sm">
+                                                        <svg class="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">
+                                                            <path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/>
+                                                        </svg>
+                                                    </span>
+                                                </div>
+
+                                                <TextInput id="search" type="search" class="block w-full mt-1 pl-9" v-model="searchForm.search" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="basis-1/3 pt-6">
+                                        <select name="cat" @change="search" v-model="searchForm.category_id" id="cat" class="border min-[300px]:w-full rounded text-gray-700 border-gray-300">
+                                            <option :value="null" selected>Select Reference Category</option>
+                                            <option :value="category.id" v-for="category in props.refrenceCategory">{{ category.title.charAt(0).toUpperCase() + category.title.slice(1) }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="basis-full p-2 mb-9 max-h-[50rem] overflow-auto mt-3" @scroll="onScroll">
+                                <table class="w-full table-auto">
                                     <thead>
                                         <tr>
-                                            <th class="border-b border-slate-300" style="width: 30%;">Title</th>
-                                            <th class="border-b border-slate-300" style="width: 20%;">File Name</th>
+                                            <th class="border-b border-slate-300" style="width: 50%;">File Name</th>
                                             <th class="border-b border-slate-300" style="width: 20%;">Date</th>
+                                            <th class="border-b border-slate-300" style="width: 20%;">View</th>
                                             <th class="border-b border-slate-300" style="width: 10%;"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="i in referenceList" class="border-b-2 py-2">
-                                            <td class="py-2 text-wrap">{{i.title}}</td>
-                                            <td class="py-2 text-wrap">{{i.file_name}}</td>
-                                            <td class="py-2 text-wrap">{{i.date}}</td>
-                                            <td class="py-2 text-wrap"><button class="border-b-2 border-b-indigo-400 hover:border-b-indigo-800" @click="fillForm(i)">Edit</button></td>
+                                        <tr v-for="i in reference.data" class="border-b-2 py-2">
+                                            <td class="py-2 text-wrap">
+                                                <div class="flex flex-col">
+                                                    <div class="">
+                                                        {{ i.file_name }}
+                                                    </div>
+                                                    <div class="text-sm text-gray-600">
+                                                        {{i.title}}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="py-2 text-wrap text-center">{{i.date}}</td>
+                                            <td class="py-2 text-wrap text-center">
+                                                <button class="p-1 hover:bg-slate-200 rounded-full" @click="view(i)">
+                                                    <EyeIcon class="h-6"/>
+                                                </button>
+                                            </td>
+                                            <td class="py-2 text-wrap text-center"><button class="border-b-2 border-b-indigo-400 hover:border-b-indigo-800" @click="fillForm(i)">Edit</button></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -412,6 +502,30 @@
                         @click="closeModal">
                             <p>OK</p>
                     </SecondaryButton>
+                </div>
+            </Modal>
+
+            <Modal :show="viewPDF" :maxWidth="'4xl'" @close="closeView">
+                <div class="p-6">
+
+                    <div class="mt-2">
+                        {{ pdfTitle }}
+                    </div>
+
+                    <div class="mt-3 border" style="height: 40rem;">
+                        <embed :src="'/storage'+pdfPath" style="width: 100%; height: 100%;"  type="application/pdf">
+                    </div>
+
+                    <div class="mt-4">
+                        Details:
+                    </div>
+                    <div class="mt-1 text-gray-800 p-2 max-h-24 overflow-auto border rounded">
+                        {{ pdfDetails }}
+                    </div>
+
+                    <div class="mt-6 flex">
+                        <SecondaryButton @click="closeView"> Close </SecondaryButton>
+                    </div>
                 </div>
             </Modal>
         </div>

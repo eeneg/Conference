@@ -105,10 +105,14 @@
         pdfModalShow.value = false
     }
 
+    const pdfTitle = ref(null)
+    const pdfDetails = ref(null)
     const viewFile = (file) => {
         file_id.value = file.id
         review_status.value = file.for_review == true ? false : true
         path.value = file.path.slice(7)
+        pdfTitle.value = file.title
+        pdfDetails.value = file.details
         pdfModalShow.value = true
     }
 
@@ -164,6 +168,10 @@
 
             }
         })
+    }
+    const onStartForReview = () => {
+        reviewForm.status = true
+        setFileForReview()
     }
     const endForReview = (id) => {
         file_id.value = id
@@ -409,21 +417,23 @@
 
     <Modal :show="pdfModalShow" :maxWidth="'4xl'" @close="closeModal">
         <div class="p-6">
-            <div class="" v-if="review_status">
-                <InputLabel>Set for Review</InputLabel>
-                <div class="flex space-x-2 mt-2">
-                    <input type="checkbox" v-model="reviewForm.status"/>
-                    <InputLabel for="latest">Yes</InputLabel>
-                </div>
-                <div class="mt-2">
-                    <PrimaryButton @click="setFileForReview()">Submit</PrimaryButton>
-                </div>
+            <div class="mt-4">
+                {{ pdfTitle }}
             </div>
-            <div class="mt-6" style="height: 40rem;">
+
+            <div class="mt-2" style="height: 40rem;">
                 <embed :src="'/storage/'+path" style="width: 100%; height: 100%;"  type="application/pdf">
             </div>
 
-            <div class="mt-6 flex">
+            <div class="mt-4">
+                Details:
+            </div>
+            <div class="mt-1 text-gray-800 p-2 max-h-24 overflow-auto border rounded">
+                {{ pdfDetails }}
+            </div>
+
+            <div class="mt-6 flex justify-between ">
+                <PrimaryButton @click="onStartForReview()">For Review</PrimaryButton>
                 <SecondaryButton @click="closeModal"> Close </SecondaryButton>
             </div>
         </div>

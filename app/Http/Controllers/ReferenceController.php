@@ -6,16 +6,28 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Reference;
 use App\Models\Category;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
 
 class ReferenceController extends Controller
 {
 
-    public function index(){
+    public function index(Request $request){
         return Inertia::render('Reference/Index',[
-            'reference' => Category::where('type', '2')->with('reference')->get(),
+            'refsearch' => $request->search,
+            'refcategory' => $request->category_id,
+            'reference' => Reference::orderBy('date')->paginate(20),
             'refrenceCategory' => Category::where('type', '2')->get(),
         ]);
+    }
+
+    public function searchReference(Request $request){
+        return  Reference::search($request->search)->query(function(Builder $q) use ($request) {
+                    $q->when($request->category_id, function($q) use ($request){
+                            $q->where('category_id', $request->category_id);
+                        });
+                    })
+                ->paginate(20);
     }
 
     public function store(Request $request){
@@ -81,10 +93,6 @@ class ReferenceController extends Controller
                 'details'       => $request->details,
             ]);
         }
-    }
-
-    public function searchReference(Request $request){
-        return Reference::search($request->search)->paginate(10);
     }
 
     public function destroy(Request $request, String $id){
