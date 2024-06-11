@@ -57,7 +57,6 @@ const onScroll = _.debounce(({ target: { scrollTop, clientHeight, scrollHeight }
 const pdfModalShow = ref(false)
 const path = ref(null)
 const viewFile = (file_path) => {
-    console.log(file_path)
     path.value = file_path
     pdfModalShow.value = true
 }
