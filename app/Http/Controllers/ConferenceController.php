@@ -7,6 +7,7 @@ use App\Models\Attachment;
 use App\Models\PdfContent;
 use App\Models\Conference;
 use App\Models\Poll;
+use App\Models\Category;
 use App\Models\PollVote;
 use App\Models\ConferenceAttendance;
 use App\Services\AttachmentEditService;
@@ -106,7 +107,8 @@ class ConferenceController extends Controller
                 ->orderBy('file_order')
                 ->get()
                 ->groupBy('category'),
-            'note' => Note::where('user_id', auth()->user()->id)->where('conference_id', $conference->id)->select('note')->first()
+            'note' => Note::where('user_id', auth()->user()->id)->where('conference_id', $conference->id)->select('note')->first(),
+            'reference_category' => Category::where('type', '2')->get()
         ]);
     }
 

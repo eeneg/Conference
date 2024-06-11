@@ -99,6 +99,7 @@
                 success = true
                 message = "Reference Updated Successfuly"
                 modalShow.value = true
+                reference.value = props.reference
                 form.reset()
             },
             onError: () => {
@@ -125,6 +126,7 @@
                 success = true
                 message = "Reference Deleted Successfuly"
                 modalShow.value = true
+                reference.value = props.reference
                 form.reset()
                 closeDeleteModal()
                 confirmForm.reset()
@@ -209,7 +211,6 @@
         axios.post(route('reference.search'), searchForm)
         .then(({data}) => {
             reference.value = data
-            console.log(data)
         })
         .catch(e => {
 
@@ -225,7 +226,6 @@
             data.data.forEach(e => {
                 reference.value.data.push(e)
             })
-            console.log(data)
         })
         .catch(e => {
 

@@ -27,7 +27,7 @@ class ReferenceController extends Controller
                             $q->where('category_id', $request->category_id);
                         });
                     })
-                ->paginate(20);
+                ->paginate(15);
     }
 
     public function store(Request $request){

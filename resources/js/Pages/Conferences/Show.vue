@@ -17,6 +17,7 @@ const props = defineProps({
     conf: Object,
     attachments: Object,
     note: Object,
+    reference_category: Object
 })
 
 
@@ -276,7 +277,7 @@ const inputSave = _.debounce(() => {
                                     <div class="p-6 mt-3">
                                         <div class="flex flex-col">
                                             <div class="flex justify-between">
-                                                <ReferencesSearch/>
+                                                <ReferencesSearch :reference_category="props.reference_category"/>
                                             </div>
                                         </div>
                                     </div>
