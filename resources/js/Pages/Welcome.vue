@@ -30,7 +30,7 @@ defineProps({
     <Head title="Welcome" />
 
     <div
-        class="relative sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white"
+        class="relative max-h-screen sm:flex sm:justify-center sm:items-center min-h-screen bg-center bg-gray-100 dark:bg-gray-900 selection:bg-red-500 selection:text-white"
     >
         <div class="flex flex-col w-full">
             <div v-if="canLogin" class="sm:fixed sm:top-0 sm:right-0 p-6 text-right w-full">
@@ -51,7 +51,7 @@ defineProps({
             </div>
 
              <!-- Features Section -->
-             <section class="py-20 dark:text-white light:text-black">
+             <section class="py-15 dark:text-white light:text-black">
                 <div class="container mx-auto px-4">
                     <div class="max-w-4xl mx-auto text-center p-6">
                         <h1 class="text-4xl font-bold mb-6">
@@ -73,7 +73,7 @@ defineProps({
             </section>
 
             <!-- Features Section -->
-            <section class="py-20">
+            <section class="">
                 <div class="container mx-auto px-4">
                     <div class="max-w-4xl mx-auto text-center">
                         <h2 class="text-3xl font-bold mb-10 dark:text-white light:text-black">Key Features</h2>
@@ -101,12 +101,4 @@ defineProps({
 </template>
 
 <style>
-.bg-dots-darker {
-    background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(0,0,0,0.07)'/%3E%3C/svg%3E");
-}
-@media (prefers-color-scheme: dark) {
-    .dark\:bg-dots-lighter {
-        background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(255,255,255,0.07)'/%3E%3C/svg%3E");
-    }
-}
 </style>
