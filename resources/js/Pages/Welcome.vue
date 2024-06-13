@@ -73,7 +73,7 @@ defineProps({
             </section>
 
             <!-- Features Section -->
-            <section class="">
+            <section class="py-5">
                 <div class="container mx-auto px-4">
                     <div class="max-w-4xl mx-auto text-center">
                         <h2 class="text-3xl font-bold mb-10 dark:text-white light:text-black">Key Features</h2>
