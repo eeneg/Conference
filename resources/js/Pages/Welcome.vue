@@ -54,8 +54,8 @@ defineProps({
              <section class="py-15 dark:text-white light:text-black">
                 <div class="container mx-auto px-4">
                     <div class="max-w-4xl mx-auto text-center p-6">
-                        <h1 class="text-4xl font-bold mb-6">
-                            PAPERLESS CONFERENCE AND FILE MANAGEMENT SYSTEM
+                        <h1 class="text-6xl font-bold mb-6">
+                            Go Paperless with Ease.
                         </h1>
                     </div>
                 </div>
@@ -65,8 +65,8 @@ defineProps({
             <!-- Features Section -->
             <section class="py-20 bg-hero light:text-white light:text-black">
                 <div class="container mx-auto px-4">
-                    <div class="max-w-4xl mx-auto text-center bg-slate-200 p-6 rou opacity-75 rounded">
-                        <h1 class="text-4xl font-bold mb-6">Go Paperless with Ease</h1>
+                    <div class="max-w-6xl mx-auto text-center bg-slate-200 p-6 rou opacity-85 rounded">
+                        <h1 class="text-4xl font-bold mb-6">PAPERLESS CONFERENCE AND FILE MANAGEMENT SYSTEM</h1>
                         <p class="text-lg mb-8">Efficiently manage your sessions and files with our minimalist platform.</p>
                     </div>
                 </div>
