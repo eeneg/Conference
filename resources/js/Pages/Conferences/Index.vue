@@ -394,17 +394,14 @@ const deleteCustomAttendance = (id) => {
                     </div>
                 </div>
             </div>
-            <div class="mt-2">
-                <h2 for="search" class="text-lg text-green-800">Custom Attendance</h2>
-            </div>
-            <div class="flex flex-col">
+            <div class="flex flex-col mt-2">
                 <div>
-                    <InputLabel for="manual">Name</InputLabel>
+                    <InputLabel for="manual">Custom Attendance</InputLabel>
                 </div>
                 <div class="flex flex-col">
                     <div class="flex space-x-3">
                         <div class="grow content-center">
-                            <TextInput class="w-full" v-model="costumAttendanceForm.name" placeholder="attendance for users without an account"></TextInput>
+                            <TextInput class="w-full" v-model="costumAttendanceForm.name" placeholder="Attendance for users without an account"></TextInput>
                         </div>
                         <div class="">
                             <PrimaryButton class="h-full" @click="customAttendanceAdd()">Add</PrimaryButton>
@@ -428,8 +425,9 @@ const deleteCustomAttendance = (id) => {
                     </div>
                 </div>
             </div>
-            <div class="mt-2">
+            <div class="mt-8">
                 <h2 for="search" class="text-lg text-green-800">Present</h2>
+                <hr>
             </div>
             <div class="flex flex-col max-h-64 overflow-y-auto">
                 <div class="flex w-full p-2 mt-2 rounded" :class="{'bg-gray-200' : i % 2 == 0}" v-for="(attendance, i) in userAttendance.present">
@@ -446,6 +444,7 @@ const deleteCustomAttendance = (id) => {
             </div>
             <div class="mt-6">
                 <h2 for="search" class="text-lg text-red-800">Absent</h2>
+                <hr>
             </div>
             <div class="flex flex-col max-h-64 overflow-y-auto">
                 <div class="flex w-full p-2 mt-2 rounded" :class="{'bg-gray-200' : i % 2 == 0}" v-for="(attendance, i) in userAttendance.absent">

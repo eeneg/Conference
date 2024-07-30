@@ -259,7 +259,7 @@
                             <div class="pl-5 pr-6 mt-3 grow mb-3">
                                 <div class="flex space-x-2 float-right">
                                     <PrimaryButton class="float-right" @click="openAddCategoryForm">Category</PrimaryButton>
-                                    <PrimaryButton class="float-right" @click="openInputForm">Add</PrimaryButton>
+                                    <PrimaryButton class="float-right" @click="openInputForm">Upload</PrimaryButton>
                                 </div>
                             </div>
                         </div>

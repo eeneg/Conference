@@ -133,7 +133,7 @@ const deleteComment = (id) => {
                         <div v-if="comment.user_id == user" class="cursor-pointer text-blue-900 hover:underline" @click="updateComment(comment.comment, comment.id)">
                             edit
                         </div>
-                        <div v-if="comment.user_id == user" class="cursor-pointer text-blue-900 hover:underline hover:text-red-900" @click="deleteComment(comment.id)">
+                        <div v-if="comment.user_id == user" class="cursor-pointer text-red-800 hover:underline hover:text-red-900" @click="deleteComment(comment.id)">
                             delete
                         </div>
                         <div class="text-black-900 text-gray-500">
@@ -158,8 +158,8 @@ const deleteComment = (id) => {
             </div>
         </div>
 
-        <div class="mt-6 flex space-x-2 justify-end">
-            <SecondaryButton @click="closeCommentModal"> Cancel </SecondaryButton>
+        <div class="mt-6 flex space-x-2 justify-start">
+            <SecondaryButton @click="closeCommentModal"> Close </SecondaryButton>
         </div>
     </div>
 </Modal>
