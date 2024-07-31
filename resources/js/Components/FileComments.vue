@@ -1,5 +1,5 @@
 <script setup>
-import { ChatBubbleBottomCenterIcon } from '@heroicons/vue/20/solid';
+import { ChatBubbleBottomCenterIcon, XCircleIcon } from '@heroicons/vue/20/solid';
 import Modal from './Modal.vue';
 import PrimaryButton from './PrimaryButton.vue';
 import SecondaryButton from './SecondaryButton.vue';
@@ -104,13 +104,22 @@ const deleteComment = (id) => {
 
 <Modal :show="commentModal" @close="closeCommentModal">
     <div class="p-6">
-        <h2 class="text-lg font-medium text-gray-900">
-            File Annotations/Comments
-        </h2>
+        <div class="flex">
+            <div class="grow">
+                        <h2 class="text-lg font-medium text-gray-900">
+                    File Annotations/Comments
+                </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
-            Add Annotations/Comments on this File
-        </p>
+                <p class="mt-1 text-sm text-gray-600">
+                    Add Annotations/Comments on this File
+                </p>
+            </div>
+            <div class="grows">
+                <div class="hover:cursor-pointer" @click="closeCommentModal()">
+                    <XCircleIcon class="h-5"/>
+                </div>
+            </div>
+        </div>
 
         <div id="comment" ref="comment" class="w-full mt-4 max-h-96 min-h-20 p-2 overflow-auto">
             <div v-if="comments.length == 0" class="text-gray-400 text-center">
@@ -146,9 +155,13 @@ const deleteComment = (id) => {
 
         <div class="w-full mt-4 mb-4">
             <div class="flex flex-col">
-                <div class="flex space-x-4">
-                    <textarea class="rounded border-gray-400 w-full" v-model="form.comment"></textarea>
-                    <PrimaryButton @click="submit()">Send</PrimaryButton>
+                <div class="flex flex-col grow space-y-1">
+                    <div class="grow">
+                        <textarea class="rounded border-gray-400 w-full" v-model="form.comment"></textarea>
+                    </div>
+                    <div class="grow">
+                        <PrimaryButton class="w-full place-content-center" @click="submit()">Save</PrimaryButton>
+                    </div>
                 </div>
                 <div class="flex">
                     <Transition enter-from-class="opacity-0" leave-to-class="opacity-0" class="transition ease-in-out">
@@ -156,10 +169,6 @@ const deleteComment = (id) => {
                     </Transition>
                 </div>
             </div>
-        </div>
-
-        <div class="mt-6 flex space-x-2 justify-start">
-            <SecondaryButton @click="closeCommentModal"> Close </SecondaryButton>
         </div>
     </div>
 </Modal>

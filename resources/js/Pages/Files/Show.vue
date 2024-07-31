@@ -356,12 +356,14 @@
                                     <p class="text-lg max-w-96 truncate float-left text-indigo-800">{{ file.file_name }}</p>
                                 </div>
                                 <div class="flex ml-2">
-                                    <p class="">Category: </p>
-                                    <p class="text-md ml-2 truncate text-gray-500">{{ file.category.map(e => e.title).join(', ')}}</p>
+                                    <p class="text-md truncate first-letter:uppercase text-gray-500">
+                                        {{
+                                            file.category.map(e => e.title.charAt(0).toUpperCase() + e.title.slice(1)).join(', ')
+                                        }}
+                                    </p>
                                 </div>
                                 <div class="flex ml-2">
-                                    <p class="">Storage: </p>
-                                    <p class="text-md ml-2 truncate text-gray-500">{{ file.storage.title }}</p>
+                                    <p class="text-md truncate first-letter:uppercase text-gray-500">{{ file.storage.title }}</p>
                                 </div>
                             </div>
                             <div class="mt-2">

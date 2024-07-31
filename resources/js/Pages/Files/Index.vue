@@ -264,23 +264,23 @@
 
                 <div class="flex">
                     <div class="flex basis-full mt-2 space-x-2" v-if="editMode">
-                        <PrimaryButton
+                        <SecondaryButton
                             class="w-full mt-2 place-content-center"
                             @click="redirectBack()">
                                 <p>Back</p>
-                        </PrimaryButton>
-                        <SecondaryButton
+                        </SecondaryButton>
+                        <PrimaryButton
                             class="w-full mt-2 place-content-center"
                             @click="closeModal">
                                 <p>OK</p>
-                        </SecondaryButton>
+                        </PrimaryButton>
                     </div>
                     <div class="basis-full mt-2" v-else="editMode == false">
-                        <SecondaryButton
+                        <PrimaryButton
                             class="w-full mt-2 place-content-center"
                             @click="closeModal">
                                 <p>OK</p>
-                        </SecondaryButton>
+                        </PrimaryButton>
                     </div>
                 </div>
             </div>
