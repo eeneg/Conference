@@ -18,12 +18,14 @@ class FileSearchController extends Controller
         return Inertia::render('Files/Show', [
             'files' => File::where('latest', true)
                 ->where('for_review', false)
-                ->with('category')->with('storage')
+                ->with('category')
+                ->with('storage')
                 ->orderBy('created_at', 'desc')
                 ->paginate(15),
             'for_review' => File::where('latest', true)
                 ->where('for_review', true)
-                ->with('category')->with('storage')
+                ->with('category')
+                ->with('storage')
                 ->orderBy('created_at', 'desc')
                 ->get(),
             'storage' => Storage::all(),
