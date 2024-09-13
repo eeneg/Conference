@@ -18,11 +18,12 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
+       if(Auth::check()){
+            $user = User::find(Auth::user()->id);
 
-        $user = User::find(Auth::user()->id);
-
-        if($user->roles()->first()->title == 'administrator'){
-            return $next($request);
+            if($user->roles()->first()->title == 'administrator'){
+                return $next($request);
+            }
         }
 
         return redirect('/dashboard');

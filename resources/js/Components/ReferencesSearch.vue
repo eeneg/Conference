@@ -56,9 +56,15 @@ const onScroll = _.debounce(({ target: { scrollTop, clientHeight, scrollHeight }
 
 const pdfModalShow = ref(false)
 const path = ref(null)
-const viewFile = (file_path) => {
-    path.value = file_path
-    pdfModalShow.value = true
+const viewFile = (id) => {
+    axios.get(`/viewReferenceBlobPDF/${id}`)
+    .then(e => {
+        path.value = e.data
+        pdfModalShow.value = true
+    })
+    .catch(e => {
+        console.log(e)
+    })
 }
 const pdfModalShowClose = () => {
     pdfModalShow.value = false
@@ -123,7 +129,7 @@ onMounted(() => {
                     {{ref.date}}
                 </div>
                 <div class="flex items-center justify-center float-right mr-1 space-x-1">
-                    <div @click="viewFile(ref.path)" class="h-8 w-8 flex items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900 cursor-pointer">
+                    <div @click="viewFile(ref.id)" class="h-8 w-8 flex items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900 cursor-pointer">
                         <EyeIcon class="w-4 h-4 fill-black " aria-hidden="true"/>
                     </div>
                 </div>
@@ -134,7 +140,7 @@ onMounted(() => {
         <div class="p-6">
 
             <div class="mt-6 h-64" style="height: 50rem;">
-                <embed :src="'/storage/'+path" style="width: 100%; height: 100%;"  type="application/pdf">
+                <embed :src="'data:application/pdf;base64,'+path" style="width: 100%; height: 100%;"  type="application/pdf">
             </div>
 
             <div class="mt-6 flex">

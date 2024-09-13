@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Laravel\Scout\Attributes\SearchUsingFullText;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Laravel\Scout\Searchable;
 use App\Models\PdfContent;
 use App\Models\Storage;

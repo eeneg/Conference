@@ -12,14 +12,9 @@ use App\Services\FileContentService;
 use App\Services\FileUploadedService;
 use App\Services\DeleteAllFileVersions;
 use Inertia\Inertia;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage as FileStorage;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rules\File as FileValidate;
 use Illuminate\Support\Facades\Redirect;
-use Exception;
-use Throwable;
 
 class FileController extends Controller
 {
@@ -69,18 +64,20 @@ class FileController extends Controller
             'storage_id.required' => 'Storage Field in required',
             'category_id.required' => 'Category Field in required',
         ]);
+
         $tr = DB::Transaction(function($e) use ($request) {
             $file = File::create([
                 'title'         => $request->title,
-                'file_name'     => str_replace(' ','_',$request->file->getClientOriginalName()),
-                'path'          => 'public/File_Uploads/'. $request->storage_id .'/'. str_replace(' ','_',$request->file->hashName()),
+                'file_name'     => $request->file->getClientOriginalName(),
+                'hash_name'     => $request->file->hashName(),
                 'storage_id'    => $request->storage_id,
                 'details'       => $request->details,
                 'date'          => $request->date,
             ]);
             return $file;
         });
-            FileStorage::putFileAs('public/File_Uploads/'. $request->storage_id, $request->file, str_replace(' ','_',$request->file->hashName()));
+
+            FileStorage::disk('local')->putFileAs('public/Temp_File_Storage/', $request->file, $request->file->hashName());
             $this->attachCategory($tr->id, $request->category_id);
             $this->fileUploadedService->handle($tr->id);
             $this->fileContentService->handle($tr->id);
@@ -192,11 +189,7 @@ class FileController extends Controller
             $fv->delete();
         }
 
-        if(count(FileStorage::files('public/File_Uploads/'.$f->storage_id)) == 1){
-            FileStorage::deleteDirectory('public/File_Uploads/'.$f->storage_id);
-        }else{
-            FileStorage::delete($f->path);
-        }
+        FileStorage::delete('file_uploads/'.$f->hash_name);
 
         $f->category()->detach();
 

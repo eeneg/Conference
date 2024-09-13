@@ -155,8 +155,8 @@ import InputError from '@/Components/InputError.vue';
                         </thead>
                         <tbody>
                             <tr v-for="user in props.users.data">
-                                <td class="p-2 pl-8 text-center border-b border-slate-100">{{ user.name }}</td>
-                                <td class="p-2 pl-8 text-center border-b border-slate-100">{{ user.email }}</td>
+                                <td class="p-2 pl-8 border-b border-slate-100">{{ user.name }}</td>
+                                <td class="p-2 pl-8 border-b border-slate-100">{{ user.email }}</td>
                                 <td class="p-2 pl-8 text-center border-b border-slate-100 relative">
                                     {{ formatRole(user.roles[0].title) }}
                                 </td>
@@ -211,8 +211,8 @@ import InputError from '@/Components/InputError.vue';
                     <div class="flex mt-2">
                         <div class="w-full">
                             <InputLabel>Password</InputLabel>
-                            <TextInput 
-                                v-model="userForm.password" 
+                            <TextInput
+                                v-model="userForm.password"
                                 class="mt-2 block w-full"
                                 type="password"
                                 autocomplete="new-password"
@@ -224,8 +224,8 @@ import InputError from '@/Components/InputError.vue';
                     <div class="flex mt-2">
                         <div class="w-full">
                             <InputLabel>Confirm Password</InputLabel>
-                            <TextInput 
-                                v-model="userForm.password_confirmation" 
+                            <TextInput
+                                v-model="userForm.password_confirmation"
                                 class="mt-2 block w-full"
                                 type="password"
                                 autocomplete="new-password"

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
+use App\Http\Middleware\IsAdmin;
 
 return [
 
@@ -70,7 +71,7 @@ return [
     |
     */
 
-    'middleware' => ['web'],
+    'middleware' => ['web', IsAdmin::class],
 
     /*
     |--------------------------------------------------------------------------

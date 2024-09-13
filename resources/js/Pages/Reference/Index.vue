@@ -190,10 +190,17 @@
     const pdfTitle = ref(null)
     const pdfDetails = ref(null)
     const view = (i) => {
-        viewPDF.value = true
-        pdfPath.value = i.path
-        pdfTitle.value = i.title
-        pdfDetails.value = i. details
+        console.log(i)
+        axios.get(`/viewReferenceBlobPDF/${i.id}`)
+        .then(e => {
+            viewPDF.value = true
+            pdfPath.value = e.data
+            pdfTitle.value = i.title
+            pdfDetails.value = i. details
+        })
+        .catch(e => {
+            console.log(e)
+        })
     }
 
     const closeView = () => {
@@ -513,7 +520,7 @@
                     </div>
 
                     <div class="mt-3 border" style="height: 40rem;">
-                        <embed :src="'/storage'+pdfPath" style="width: 100%; height: 100%;"  type="application/pdf">
+                        <embed :src="'data:application/pdf;base64,'+pdfPath" style="width: 100%; height: 100%;"  type="application/pdf">
                     </div>
 
                     <div class="mt-4">

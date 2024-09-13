@@ -33,13 +33,11 @@ class FileVersionController extends Controller
     public function store(Request $request){
 
         $request->validate([
-            'file' => 'required',
+            'file' => 'required|mimes:pdf',
             'title' => 'required:|unique:files',
         ]);
 
         $old_file = File::find($request->file_id);
-
-        $fv = FileVersionControl::where('file_id', $old_file->id)->first();
 
         if($request->latest){
             $this->replaceLatestFile($old_file);
@@ -47,7 +45,7 @@ class FileVersionController extends Controller
 
         $file = File::create([
             'title'         => $request->title,
-            'file_name'     => str_replace(' ','_',$request->file->getClientOriginalName()),
+            'file_name'     => $request->file->getClientOriginalName(),
             'path'          => 'public/File_Uploads/'. $old_file->storage_id .'/'. str_replace(' ','_',$request->file->hashName()),
             'storage_id'    => $old_file->storage_id,
             'details'       => $old_file->details,
@@ -57,7 +55,7 @@ class FileVersionController extends Controller
         ]);
 
         FileVersionControl::create([
-            'control_id' => $fv->control_id,
+            'control_id' => FileVersionControl::where('file_id', $old_file->id)->first()->control_id,
             'file_id' => $file->id,
         ]);
 
@@ -69,15 +67,13 @@ class FileVersionController extends Controller
     public function attachCategory($id, $oldID){
         $file = File::find($id);
 
-        $categories = FileCategory::where('file_id', $id)->get('category_id');
-
         $file->category()->attach(collect(File::find($oldID)->category)->map->id);
 
         $file->load('category')->searchable();
     }
 
     public function replaceLatestFile($file){
-        $asd = File::find($file->id)->update(['latest' => false]);
+        $replace = File::find($file->id)->update(['latest' => false]);
     }
 
     public function update(Request $request, $id){

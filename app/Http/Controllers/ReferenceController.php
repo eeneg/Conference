@@ -50,11 +50,11 @@ class ReferenceController extends Controller
                 'title'         => $request->title,
                 'date'          => $request->date,
                 'details'       => $request->details,
-                'file_name'     => str_replace(' ','_',$request->file->getClientOriginalName()),
-                'path'          => '/Reference_Files/' . $request->category_id . '/' . str_replace(' ','_',$request->file->getClientOriginalName()),
+                'file_name'     => $request->file->getClientOriginalName(),
+                'hash_name'     => $request->file->hashName()
             ]);
 
-            Storage::putFileAs('public/Reference_Files/' . $request->category_id . '/', $request->file, str_replace(' ','_',$request->file->getClientOriginalName()));
+            Storage::putFileAs('reference_files/', $request->file, $request->file->hashName());
         }
 
     }
@@ -75,16 +75,16 @@ class ReferenceController extends Controller
         $ref = Reference::find($id);
 
         if($request->hasFile('file')){
+            Storage::delete('reference_files/'.$ref->hash_name);
             $ref->update([
                 'title'         => $request->title,
                 'category_id'   => $request->category_id,
                 'date'          => $request->date,
                 'details'       => $request->details,
-                'file_name'     => str_replace(' ','_',$request->file->getClientOriginalName()),
-                'path'          => '/Reference_Files/' . $request->category_id . '/' . str_replace(' ','_',$request->file->getClientOriginalName()),
+                'file_name'     => $request->file->getClientOriginalName(),
+                'hash_name'     => $request->file->hashName()
             ]);
-            Storage::delete('public/Reference_Files/' . $request->category_id . '/' . str_replace(' ','_',$request->file->getClientOriginalName()));
-            Storage::putFileAs('public/Reference_Files/' . $request->category_id . '/', $request->file, str_replace(' ','_',$request->file->getClientOriginalName()));
+            Storage::putFileAs('reference_files/', $request->file, $request->file->hashName());
         }else{
             $ref->update([
                 'title'         => $request->title,
@@ -102,7 +102,7 @@ class ReferenceController extends Controller
 
         $ref = Reference::find($id);
 
-        Storage::delete('public/Reference_Files/' . $ref->category_id . '/' . $ref->file_name);
+        Storage::delete('reference_files/'.$ref->hash_name);
 
         $ref->delete();
     }

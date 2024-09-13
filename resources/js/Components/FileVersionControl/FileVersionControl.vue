@@ -96,9 +96,15 @@ const deleteFileVersion = (id) => {
 const path = ref(null)
 
 const pdfModalShow = ref(false)
-const pdfModal = (p) => {
-    path.value = p.slice(7)
-    pdfModalShow.value = true
+const pdfModal = (id) => {
+    axios.get(`viewBlobPDF/${id}`)
+    .then(e => {
+        path.value = e.data
+        pdfModalShow.value = true
+    })
+    .catch(e => {
+        console.log(e)
+    })
 }
 const pdfModalShowClose = () => {
     pdfModalShow.value = false
@@ -211,7 +217,7 @@ const pdfModalShowClose = () => {
                                         <template #content>
                                             <div
                                                 class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out"
-                                                @click="pdfModal(file.path)"
+                                                @click="pdfModal(file.id)"
                                                 >
 
                                                 View
@@ -312,7 +318,7 @@ const pdfModalShowClose = () => {
             <div class="p-6">
 
                 <div class="mt-6 h-64" style="height: 50rem;">
-                    <embed :src="'/storage/'+path" style="width: 100%; height: 100%;"  type="application/pdf">
+                    <embed :src="'data:application/pdf;base64,'+path" style="width: 100%; height: 100%;"  type="application/pdf">
                 </div>
 
                 <div class="mt-6 flex justify-between">

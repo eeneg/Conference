@@ -8,12 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 use App\Models\Category;
 use App\Models\PdfContent;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Laravel\Scout\Attributes\SearchUsingFullText;
 
 class Reference extends Model
 {
     use HasUuids, HasFactory, Searchable;
 
-    protected $fillable = ['title', 'date', 'details', 'file_name', 'path'];
+    protected $fillable = ['title', 'date', 'details', 'file_name', 'hash_name'];
 
     public function category(): BelongsTo
     {

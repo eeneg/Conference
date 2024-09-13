@@ -7,7 +7,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\StorageController;
 use App\Http\Controllers\AttachmentController;
-use App\Http\Controllers\SettingController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ReferenceController;
 use App\Http\Controllers\ChatController;
@@ -19,14 +18,11 @@ use App\Http\Controllers\FileVersionController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FileCommentController;
+use App\Http\Controllers\FileViewController;
 use App\Http\Controllers\ManualAttendanceController;
 use App\Http\Middleware\IsAdmin;
-use App\Models\Minutes;
 use App\Models\Message;
-use App\Models\User;
-use GuzzleHttp\Client;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 /*
@@ -113,6 +109,9 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::resource('users', UserController::class)->middleware([IsAdmin::class]);
 
     Route::resource('manualAttendance', ManualAttendanceController::class);
+
+    Route::get('/viewBlobPDF/{id}', [FileViewController::class, 'fileView'])->name('pdf.view');
+    Route::get('/viewReferenceBlobPDF/{id}', [FileViewController::class, 'referenceView']);
 });
 
 

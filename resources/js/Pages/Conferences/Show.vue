@@ -61,7 +61,17 @@ const action = computed(() => embed.value?.is_video || embed.value?.is_audio ? '
 const title = computed(() => embed.value?.is_previewable ? `${action.value} ${embed.value.file_name}` : `Conferences ${props.conf.title}`)
 
 const reembed = (attachment) =>{
-    embed.value = embed.value === attachment ? null : attachment
+    if(embed.value == null || embed.value.id != attachment.id)
+    {
+        axios.get(`/viewBlobPDF/${attachment.id}`)
+        .then(e => {
+            embed.value = embed.value === attachment ? null : attachment
+            embed.value.pdf = e.data
+        })
+        .catch(e => {
+            console.log(e)
+        })
+    }
 }
 
 const form = useForm({
@@ -211,35 +221,11 @@ const inputSave = _.debounce(() => {
                                     </div>
 
                                     <embed
-                                        v-if="embed?.is_previewable && !embed?.is_media"
+                                        v-if="embed != null"
                                         class="w-full h-full rounded-lg"
                                         :class="[]"
-                                        :src="embed?.is_text_previewable ? route('attachment.content', embed.id) : url"
+                                        :src="'data:application/pdf;base64,'+embed.pdf"
                                     >
-
-                                    <img
-                                        v-else-if="embed?.is_image"
-                                        class="w-full h-auto rounded-md"
-                                        :src="url"
-                                    />
-
-                                    <video
-                                        v-else-if="embed?.is_video"
-                                        class="w-full h-auto rounded-md"
-                                        controls
-                                        :autoplay="false"
-                                    >
-                                        <source :src="url" :type="embed.mime">
-                                    </video>
-
-                                    <audio
-                                        v-else-if="embed?.is_audio"
-                                        class="w-full max-w-md mx-auto my-3"
-                                        controls
-                                        :autoplay="false"
-                                    >
-                                        <source :src="url" :type="embed.mime">
-                                    </audio>
                                 </div>
                             </div>
                         </TabPanel>

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('file_name');
             $table->date('date');
-            $table->string('path');
+            $table->string('hash_name');
             $table->string('details');
             $table->boolean('for_review')->default(false);
             $table->boolean('latest')->default(true);

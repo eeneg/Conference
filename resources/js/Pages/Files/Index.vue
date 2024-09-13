@@ -1,4 +1,5 @@
 <script setup>
+    import MultipleFileUpload from '@/Components/MultipleFileUpload.vue';
     import { Head, router, useForm } from '@inertiajs/vue3';
     import TextInput from '@/Components/TextInput.vue';
     import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -22,10 +23,10 @@
         storage_id: null,
         category_id: [],
         date: null,
-        details: null
+        details: null,
+        sorted: true,
     })
 
-    const existingFileNames = ref([])
     const submitErrorMsg = ref('')
     var fileNames = []
 
@@ -43,7 +44,6 @@
                 message = "File Uploaded Successfuly"
                 modalShow.value = true
                 form.reset()
-                existingFileNames.value = []
                 submitErrorMsg.value = ''
                 document.getElementById('files').value = ''
             },
@@ -72,7 +72,6 @@
                 success = true
                 message = "File Updated"
                 modalShow.value = true
-                existingFileNames.value = []
                 submitErrorMsg.value = ''
             },
             onError: (e) => {
@@ -111,7 +110,6 @@
     const getFiles = (e, i) => {
         form.file = e.target.files[0]
         fileNames = []
-        existingFileNames.value = []
         submitErrorMsg.value = ''
         Array.from(e.target.files).forEach(element => {
             fileNames.push(element.name)
@@ -228,26 +226,7 @@
                         </div>
                     </div>
                     <div class="space-y-6 pl-6 pr-6 max-h-72 overflow-auto">
-                        <table class="w-full" v-if="existingFileNames.length > 0">
-                            <thead>
-                                <tr>
-                                    <th class="border-b border-slate-300 w-1/6 text-center">#</th>
-                                    <th class="border-b border-slate-300 w-5/6 text-center text-red-600">
-                                        Duplicate Files <br> (Please Delete or Rename Files)
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-slate-700">
-                                <tr v-for="(file, i) in existingFileNames">
-                                    <td class="text-center p-1 text-center border-b border-slate-100">
-                                        {{ i + 1 }}
-                                    </td>
-                                    <td class="text-center p-1 text-center border-b border-slate-100">
-                                        {{file}}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <MultipleFileUpload/>
                     </div>
                 </div>
             </div>
