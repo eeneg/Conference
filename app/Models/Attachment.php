@@ -22,11 +22,6 @@ class Attachment extends Model
         return $this->belongsTo(Conference::class);
     }
 
-    public function pdfContent() : MorphOne
-    {
-        return $this->morphOne(PdfContent::class, 'contentable');
-    }
-
     public function storage(){
         return $this->belongsTo(Storage::class, 'storage_id');
     }

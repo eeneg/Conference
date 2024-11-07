@@ -20,7 +20,6 @@
                 success = true
                 message = "Confrence Submitted Successfuly"
                 modalShow.value = true
-                // form.reset()
             },
             onError: (e) => {
                 console.log(e)

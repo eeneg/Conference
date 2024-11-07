@@ -48,11 +48,11 @@ class ProcessFileContent implements ShouldQueue
             $file->pdfContent()->create(['content' => $res]);
             $this->uploadToBlob($file);
         }else{
-            $file->pdfContent()->create(['content' => $er]);
             $this->logError($file->id, $er, 'File Content Unreadable');
         }
 
-        $file->loadMorph('contentable', [PdfContent::class => 'pdfContent'])->searchable();
+        $file->update(['processed' => true])->searchable();
+
     }
 
     public function logError($file_id, $verbose, $remark) : void{
@@ -67,7 +67,7 @@ class ProcessFileContent implements ShouldQueue
         try{
             $upload = Storage::put('file_uploads/'.$file->hash_name, $pdf);
         }catch(Exception $e){
-
+            File::find($file->file_id)->fileError()->create(['verbose' => $e, 'remark' => 'File upload to blob failed']);
         }
 
         $delete = Storage::disk('local')->delete('public/Temp_File_Storage/'.$file->hash_name);

@@ -67,7 +67,7 @@ class FileSearchController extends Controller
     }
 
     public function downloadFile(File $file){
-        return StorageDownload::download($file->path, $file->file_name);
+        return StorageDownload::download('file_uploads/'.$file->hash_name, $file->file_name);
     }
 
 }

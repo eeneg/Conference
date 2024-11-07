@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Laravel\Scout\Attributes\SearchUsingFullText;
 use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -22,9 +21,14 @@ class File extends Model
 {
     use HasFactory, HasUuids, Searchable;
 
-    protected $fillable = ['title', 'file_name', 'storage_id', 'category_id', 'hash_name', 'details', 'date', 'latest', 'for_review', 'sorted'];
+    protected $fillable = ['title', 'file_name', 'storage_id', 'category_id', 'hash_name', 'details', 'date', 'latest', 'for_review', 'processed', 'sorted'];
 
     protected $casts = ['tags' => 'array'];
+
+    public function thumbnail() : HasOne
+    {
+        return $this->hasOne(FileThumbnail::class);
+    }
 
     public function storage() : BelongsTo
     {
@@ -41,9 +45,9 @@ class File extends Model
         return $this->belongsToMany(Category::class, 'file_categories', 'file_id', 'category_id')->using(FileCategory::class);
     }
 
-    public function pdfContent() : MorphOne
+    public function pdfContent() : HasOne
     {
-        return $this->morphOne(PdfContent::class, 'contentable');
+        return $this->hasOne(PdfContent::class);
     }
 
     public function fileComment() : HasMany{

@@ -46,7 +46,7 @@ class FileVersionController extends Controller
         $file = File::create([
             'title'         => $request->title,
             'file_name'     => $request->file->getClientOriginalName(),
-            'path'          => 'public/File_Uploads/'. $old_file->storage_id .'/'. str_replace(' ','_',$request->file->hashName()),
+            'hash_name'     => $request->file->hashName(),
             'storage_id'    => $old_file->storage_id,
             'details'       => $old_file->details,
             'date'          => $old_file->date,
@@ -59,7 +59,7 @@ class FileVersionController extends Controller
             'file_id' => $file->id,
         ]);
 
-        FileStorage::putFileAs('public/File_Uploads/'. $file->storage_id, $request->file, str_replace(' ','_',$request->file->hashName()));
+        FileStorage::disk('local')->putFileAs('public/Temp_File_Storage/', $request->file, $request->file->hashName());
         $this->fileContentService->handle($file->id);
         $this->attachCategory($file->id, $old_file->id);
     }
@@ -96,11 +96,7 @@ class FileVersionController extends Controller
 
         $f = File::find($id);
 
-        if(count(FileStorage::files('public/File_Uploads/'.$f->storage_id)) == 1){
-            FileStorage::deleteDirectory('public/File_Uploads/'.$f->storage_id);
-        }else{
-            FileStorage::delete($f->path);
-        }
+        FileStorage::delete('file_uploads/'.$f->hash_name);
 
         $f->category()->detach();
 

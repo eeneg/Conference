@@ -17,13 +17,15 @@ return new class extends Migration
             $table->foreign('storage_id')
                 ->references('id')
                 ->on('storages');
-            $table->string('title');
+            $table->string('title')->nullable();
             $table->string('file_name');
-            $table->date('date');
+            $table->date('date')->nullable();
             $table->string('hash_name');
-            $table->string('details');
+            $table->string('details')->nullable();
             $table->boolean('for_review')->default(false);
             $table->boolean('latest')->default(true);
+            $table->boolean('processed')->default(false);
+            $table->boolean('sorted')->default(false);
             $table->timestamps();
         });
     }

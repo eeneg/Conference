@@ -109,18 +109,18 @@
     const pdfDetails = ref(null)
     const viewFile = (file) => {
 
-        axios.get(`/viewBlobPDF/${file.id}`)
-        .then(e => {
-            path.value = e.data
-            file_id.value = file.id
-            review_status.value = file.for_review == true ? false : true
-            pdfTitle.value = file.title
-            pdfDetails.value = file.details
-            pdfModalShow.value = true
-        })
-        .catch(e => {
-            console.log(e)
-        })
+        // axios.get(`/viewBlobPDF/${file.id}`)
+        // .then((e) => {
+        path.value = file.id
+        file_id.value = file.id
+        review_status.value = file.for_review == true ? false : true
+        pdfTitle.value = file.title
+        pdfDetails.value = file.details
+        pdfModalShow.value = true
+        // })
+        // .catch(e => {
+        //     console.log(e)
+        // })
     }
 
     const renameForm = useForm({
@@ -431,7 +431,7 @@
             </div>
 
             <div class="mt-2" style="height: 40rem;">
-                <embed :src="'data:application/pdf;base64,'+path" style="width: 100%; height: 100%;"  type="application/pdf">
+                <iframe :src="`/viewBlobPDF/`+path" style="width: 100%; height: 100%;"  type="application/pdf"></iframe>
             </div>
 
             <div class="mt-4">

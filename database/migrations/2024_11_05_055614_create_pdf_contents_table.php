@@ -11,15 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('file_read_errors', function (Blueprint $table) {
+        Schema::create('pdf_contents', function (Blueprint $table) {
             $table->uuid('id')->primary()->unique();
             $table->uuid('file_id');
             $table->foreign('file_id')
                 ->references('id')
                 ->on('files')
                 ->onDelete('cascade');
-            $table->string('verbose');
-            $table->string('remark');
+            $table->text('content');
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('file_read_errors');
+        Schema::dropIfExists('pdf_contents');
     }
 };

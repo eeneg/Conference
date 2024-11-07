@@ -1,6 +1,5 @@
 import sys
 import pytesseract
-import os
 from pdf2image import pdfinfo_from_path, convert_from_path
 import spacy
 
@@ -14,7 +13,7 @@ class processAttachent:
 
     for page in range(1, max_pages + 1, 5):
         converted = convert_from_path(pdf, first_page=page, last_page=min(page+5-1,max_pages))
-        for image in converted:
+        for i, image in enumerate(converted):
             text = pytesseract.image_to_string(image)
             res += text.replace("\n", "")
 

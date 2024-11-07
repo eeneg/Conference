@@ -120,14 +120,14 @@ class ConferenceController extends Controller
         $conf = Conference::find($id);
 
         $e = Attachment::leftJoin('files', 'attachments.file_id', '=', 'files.id')
-        ->select('attachments.id', 'attachments.conference_id', 'files.id as file_id', 'files.file_name', 'files.path', 'attachments.category', 'attachments.category_order', 'attachments.file_order')
-        ->where('conference_id', $conf->id)
-        ->orderBy('attachments.category_order', 'ASC')
-        ->get()
-        ->groupBy('category')
-        ->map(function($e){
-            return collect($e)->sortBy('file_order');
-        });
+            ->select('attachments.id', 'attachments.conference_id', 'files.id as file_id', 'files.file_name', 'attachments.category', 'attachments.category_order', 'attachments.file_order')
+            ->where('conference_id', $conf->id)
+            ->orderBy('attachments.category_order', 'ASC')
+            ->get()
+            ->groupBy('category')
+            ->map(function($e){
+                return collect($e)->sortBy('file_order');
+            });
 
         $attachments = [];
 

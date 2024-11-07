@@ -10,7 +10,6 @@ use App\Models\Attachment;
 use App\Models\FileVersionControl;
 use App\Services\FileContentService;
 use App\Services\FileUploadedService;
-use App\Services\DeleteAllFileVersions;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage as FileStorage;
@@ -22,7 +21,6 @@ class FileController extends Controller
     public function __construct(
         private FileContentService $fileContentService,
         private FileUploadedService $fileUploadedService,
-        private DeleteAllFileVersions $deleteAllFileVersions,
     ){}
 
     /**
@@ -77,10 +75,10 @@ class FileController extends Controller
             return $file;
         });
 
-            FileStorage::disk('local')->putFileAs('public/Temp_File_Storage/', $request->file, $request->file->hashName());
-            $this->attachCategory($tr->id, $request->category_id);
-            $this->fileUploadedService->handle($tr->id);
-            $this->fileContentService->handle($tr->id);
+        FileStorage::disk('local')->putFileAs('public/Temp_File_Storage/', $request->file, $request->file->hashName());
+        $this->attachCategory($tr->id, $request->category_id);
+        $this->fileUploadedService->handle($tr->id);
+        $this->fileContentService->handle($tr->id);
     }
 
     public function attachCategory($id, $categories){
@@ -180,16 +178,16 @@ class FileController extends Controller
             ]);
         }
 
-
         $fv = FileVersionControl::where('file_id', $id)->first();
 
-        if(FileVersionControl::where('control_id', FileVersionControl::where('file_id', $id)->first()->control_id)->get()->count() > 1 && $f->latest == true){
-            $this->deleteAllFileVersions->handle($id);
+        if(FileVersionControl::where('control_id', $fv->control_id)->get()->count() > 1 && $f->latest == true){
+            $files = FileVersionControl::where('control_id', $fv->control_id)->get('file_id');
+            $files = File::whereIn('id', $files)->get()->map(fn($e) => 'file_uploads/'.$e->hash_name);
+            $delete = FileStorage::delete($files->toArray());
         }else{
             $fv->delete();
+            FileStorage::delete('file_uploads/'.$f->hash_name);
         }
-
-        FileStorage::delete('file_uploads/'.$f->hash_name);
 
         $f->category()->detach();
 

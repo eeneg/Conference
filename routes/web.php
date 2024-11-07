@@ -20,6 +20,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FileCommentController;
 use App\Http\Controllers\FileViewController;
 use App\Http\Controllers\ManualAttendanceController;
+use App\Http\Controllers\MultipleFileUploadController;
 use App\Http\Middleware\IsAdmin;
 use App\Models\Message;
 use Illuminate\Foundation\Application;
@@ -67,6 +68,9 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::patch('/file_rename/{id}', [FileController::class, 'renameFile'])->name('file.rename');
     Route::patch('/file_review/{id}', [FileController::class, 'setFileForReview'])->name('file.review');
     Route::get('/file_check/{id}', [FileController::class, 'checkFile'])->name('file.check');
+
+    Route::resource('multipleFileUpload', MultipleFileUploadController::class);
+    Route::post('/checkDuplicateFileName', [MultipleFileUploadController::class, 'checkDuplicateFileName'])->name('upload.check');
 
     Route::get('/fileList', [FileSearchController::class, 'index'])->name('file.index');
     Route::get('/fileSearch', [FileSearchController::class, 'searchFile'])->name('file.search');

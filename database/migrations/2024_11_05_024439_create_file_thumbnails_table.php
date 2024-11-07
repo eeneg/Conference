@@ -11,11 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pdf_contents', function (Blueprint $table) {
+        Schema::create('file_thumbnails', function (Blueprint $table) {
             $table->uuid('id')->primary()->unique();
-            $table->uuid('contentable_id');
-            $table->string('contentable_type');
-            $table->text('content');
+            $table->uuid('file_id');
+            $table->foreign('file_id')
+                ->references('id')
+                ->on('files')
+                ->onDelete('cascade');
+            $table->longtext('base64_thumbnail');
             $table->timestamps();
         });
     }
@@ -25,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pdf_contents');
+        Schema::dropIfExists('file_thumbnails');
     }
 };
