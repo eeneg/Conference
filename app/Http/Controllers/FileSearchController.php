@@ -20,6 +20,7 @@ class FileSearchController extends Controller
                 ->where('for_review', false)
                 ->with('category')
                 ->with('storage')
+                ->with('thumbnail')
                 ->orderBy('created_at', 'desc')
                 ->paginate(15),
             'for_review' => File::where('latest', true)
@@ -40,6 +41,7 @@ class FileSearchController extends Controller
                 $query->where('latest', true)
                     ->with('storage')
                     ->with('category')
+                    ->with('thumbnail')
                     ->when($request->storage, function($query) use ($request){
                         $query->where('storage_id', $request->storage);
                     })

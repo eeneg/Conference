@@ -353,6 +353,9 @@
                     </div>
                     <div class="border rounded pr-2 pl-2 mt-2 group" v-for="(file, i) in files.data">
                         <div class="flex">
+                            <div>
+                                <img :src="'data:image/png;base64,'+file.thumbnail?.base64_thumbnail" alt="">
+                            </div>
                             <div class="flex items-center p-1 justify-center sm:text-sm">
                                 <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-300 text-red-900">
                                     <DocumentIcon class="w-5 h-5 stroke-gray-900 fill-none " aria-hidden="true" />
