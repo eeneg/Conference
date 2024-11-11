@@ -9,10 +9,8 @@
     import PrimaryButton from '@/Components/PrimaryButton.vue';
     import InputError from '@/Components/InputError.vue';
     import InputLabel from '@/Components/InputLabel.vue';
-    import Dropdown from '@/Components/Dropdown.vue';
-    import DropdownLink from '@/Components/DropdownLink.vue';
     import FileComments from '@/Components/FileComments.vue';
-    import { ArrowDownTrayIcon, DocumentIcon, EllipsisVerticalIcon, EyeIcon, CheckIcon } from '@heroicons/vue/20/solid';
+    import { ArrowDownTrayIcon, DocumentIcon, Bars3Icon, EyeIcon, CheckIcon, DocumentTextIcon } from '@heroicons/vue/20/solid';
     import { useForm } from '@inertiajs/vue3';
     import { ref } from 'vue';
     import { router } from '@inertiajs/vue3'
@@ -351,32 +349,39 @@
                         <h2 class="text-lg font-bold">Files</h2>
                         <hr>
                     </div>
-                    <div class="border rounded pr-2 pl-2 mt-2 group" v-for="(file, i) in files.data">
-                        <div class="flex">
-                            <div>
-                                <img :src="'data:image/png;base64,'+file.thumbnail?.base64_thumbnail" alt="">
-                            </div>
-                            <div class="flex items-center p-1 justify-center sm:text-sm">
-                                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-300 text-red-900">
-                                    <DocumentIcon class="w-5 h-5 stroke-gray-900 fill-none " aria-hidden="true" />
+                    <div class="pr-1 pl-1 mt-2 group">
+                        <div class="flex flex-wrap">
+                            <div class="basis-1/4 py-3 px-2" v-for="(file, i) in files.data">
+                                <div class="border rounded py-2 px-4 bg-slate-200 max-w-[18rem] h-[18rem]">
+                                    <div class="flex flex-col space-y-2">
+                                        <div class="flex flex-row justify-between">
+                                            <div class="flex flex-col">
+                                                <div class="text-md max-w-[12rem]">
+                                                    <p class="truncate overflow-hidden ...">{{ file.title }}</p>
+                                                </div>
+                                                <div class="text-sm max-w-[12rem]">
+                                                    <p class="truncate overflow-hidden ...">{{ file.file_name }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="">
+                                                <button class="border rounded-full hover:bg-slate-300"><Bars3Icon class="w-4 h-4"/></button>
+                                            </div>
+                                        </div>
+                                        <div class="flex content-center justify-center rounded h-[10rem] bg-white">
+                                            <img :src="'data:image/png;base64,'+file.thumbnail?.base64_thumbnail" alt="">
+                                        </div>
+                                        <div class="text-sm text-gray-600">
+                                            {{ file.storage.title }}
+                                        </div>
+                                        <div class="text-sm">
+                                            {{
+                                                file.category.map(e => e.title.charAt(0).toUpperCase() + e.title.slice(1)).join(', ')
+                                            }}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="grow p-1 text-sm">
-                                <div class="flex ml-2">
-                                    <p class="text-lg max-w-96 truncate float-left text-indigo-800">{{ file.file_name }}</p>
-                                </div>
-                                <div class="flex ml-2">
-                                    <p class="text-md truncate first-letter:uppercase text-gray-500">
-                                        {{
-                                            file.category.map(e => e.title.charAt(0).toUpperCase() + e.title.slice(1)).join(', ')
-                                        }}
-                                    </p>
-                                </div>
-                                <div class="flex ml-2">
-                                    <p class="text-md truncate first-letter:uppercase text-gray-500">{{ file.storage.title }}</p>
-                                </div>
-                            </div>
-                            <div class="mt-2">
+                            <!-- <div class="mt-2">
                                 <div class="flex items-center justify-center float-right space-x-1">
                                     <div class="hidden group-hover:block">
                                         <FileComments :file_id="file.id"/>
@@ -419,7 +424,7 @@
                                         </template>
                                     </Dropdown>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
