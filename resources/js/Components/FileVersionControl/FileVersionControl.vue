@@ -116,8 +116,8 @@ const pdfModalShowClose = () => {
 <template>
    <div>
         <button @click="openFileVerionsModal">
-            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-red-900">
-                <BarsArrowUpIcon class="w-5 h-5 stroke-gray-900 fill-black aria-hidden" aria-hidden="true" />
+            <div class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer">
+                File Versions
             </div>
         </button>
 

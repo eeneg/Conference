@@ -10,12 +10,14 @@
     import InputError from '@/Components/InputError.vue';
     import InputLabel from '@/Components/InputLabel.vue';
     import FileComments from '@/Components/FileComments.vue';
-    import { ArrowDownTrayIcon, DocumentIcon, Bars3Icon, EyeIcon, CheckIcon, DocumentTextIcon } from '@heroicons/vue/20/solid';
+    import { ArrowDownTrayIcon, DocumentIcon, Bars3Icon, EyeIcon, CheckIcon } from '@heroicons/vue/20/solid';
     import { useForm } from '@inertiajs/vue3';
     import { ref } from 'vue';
     import { router } from '@inertiajs/vue3'
     import axios from 'axios';
     import _ from 'lodash';
+    import Dropdown from '@/Components/Dropdown.vue';
+    import DropdownLink from '@/Components/DropdownLink.vue';
 
     const props = defineProps({files: Object, storage: Object, category: Object, for_review:Object})
 
@@ -237,6 +239,26 @@
     const closeDeleteForeverModal = () => {
         deleteForeverModal.value = false
     }
+
+    const downloadFile = (id, file_name) => {
+        axios.get(route('file.download', {id:id}), { responseType: 'blob' })
+        .then((response) => {
+            const url = window.URL.createObjectURL(new Blob([response.data], {type: 'application/pdf'}))
+            const tempLink = document.createElement('a')
+            tempLink.href = url
+            tempLink.setAttribute('download', file_name)
+            document.body.appendChild(tempLink)
+            tempLink.click()
+            document.body.removeChild(tempLink)
+            window.URL.revokeObjectURL(url)
+        })
+        .catch(() => {
+            header = 'Error'
+            message = 'Error downloading file'
+            success = false
+            responseModal.value = true
+        })
+    }
 </script>
 <template>
 
@@ -352,11 +374,11 @@
                     <div class="pr-1 pl-1 mt-2 group">
                         <div class="flex flex-wrap">
                             <div class="basis-1/4 py-3 px-2" v-for="(file, i) in files.data">
-                                <div class="border rounded py-2 px-4 bg-slate-200 max-w-[18rem] h-[18rem]">
+                                <div class="border rounded py-2 px-4 max-w-[18rem] h-[18rem]" :class="[file.processed ? 'bg-slate-200' : 'bg-red-200']">
                                     <div class="flex flex-col space-y-2">
                                         <div class="flex flex-row justify-between">
                                             <div class="flex flex-col">
-                                                <div class="text-md max-w-[12rem]">
+                                                <div class="text-md max-w-[12rem] h-[1rem]">
                                                     <p class="truncate overflow-hidden ...">{{ file.title }}</p>
                                                 </div>
                                                 <div class="text-sm max-w-[12rem]">
@@ -364,67 +386,82 @@
                                                 </div>
                                             </div>
                                             <div class="">
-                                                <button class="border rounded-full hover:bg-slate-300"><Bars3Icon class="w-4 h-4"/></button>
+                                                <Dropdown class="absolute" align="right" width="48">
+                                                    <template #trigger>
+                                                        <button>
+                                                            <div class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-300 hover:bg-slate-400 text-black-900">
+                                                                <Bars3Icon class="w-4 h-4 fill-black aria-hidden" aria-hidden="true" />
+                                                            </div>
+                                                        </button>
+                                                    </template>
+
+                                                    <template #content>
+                                                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
+                                                            <li>
+                                                                <div
+                                                                    class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
+                                                                    @click="downloadFile(file.id, file.file_name)"
+                                                                >
+                                                                    Download
+                                                                </div>
+                                                            </li>
+                                                            <li>
+                                                                <div
+                                                                    class="block w-full text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
+                                                                >
+                                                                        <FileComments :file_id="file.id"/>
+                                                                </div>
+                                                            </li>
+                                                            <li>
+                                                                <div
+                                                                    class="block w-full text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
+                                                                >
+                                                                    <FileVersioncontrol @refreshData="reloadLatest($event)" />
+                                                                </div>
+                                                            </li>
+                                                            <li>
+                                                                <div
+                                                                    class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
+                                                                    @click="openRenameModal(file.id, file.file_name, i)"
+                                                                >
+                                                                    Rename
+                                                                </div>
+                                                            </li>
+                                                            <li>
+                                                                <div
+                                                                    class="block w-full px-4 py-1 text-left text-sm leading-5 text-red-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
+                                                                    @click="deleteFile(file.id)"
+                                                                >
+                                                                    Delete
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </template>
+                                                </Dropdown>
                                             </div>
                                         </div>
                                         <div class="flex content-center justify-center rounded h-[10rem] bg-white">
                                             <img :src="'data:image/png;base64,'+file.thumbnail?.base64_thumbnail" alt="">
                                         </div>
-                                        <div class="text-sm text-gray-600">
-                                            {{ file.storage.title }}
-                                        </div>
-                                        <div class="text-sm">
-                                            {{
-                                                file.category.map(e => e.title.charAt(0).toUpperCase() + e.title.slice(1)).join(', ')
-                                            }}
+                                        <div class="flex flex-row justify-between p-0">
+                                            <div class="flex flex-col p-0">
+                                                    <div class="text-sm text-gray-600 text-sm max-w-[12rem]">
+                                                    <p class="truncate overflow-hidden ...">
+                                                        {{ file.storage.title }}
+                                                    </p>
+                                                </div>
+                                                <div class="text-sm text-gray-600 text-sm max-w-[12rem]">
+                                                <p class="truncate overflow-hidden ...">
+                                                        {{
+                                                            file.category.map(e => e.title.charAt(0).toUpperCase() + e.title.slice(1)).join(', ')
+                                                        }}
+                                                </p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- <div class="mt-2">
-                                <div class="flex items-center justify-center float-right space-x-1">
-                                    <div class="hidden group-hover:block">
-                                        <FileComments :file_id="file.id"/>
-                                    </div>
-                                    <div class="hidden group-hover:block">
-                                        <FileVersioncontrol @refreshData="reloadLatest($event)" :file_id="file.id"/>
-                                    </div>
-                                    <a class="hidden group-hover:block" :href="route('file.download',{ id:file.id })">
-                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-red-900">
-                                            <ArrowDownTrayIcon class="w-5 h-5 stroke-gray-900 fill-black " aria-hidden="true" />
-                                        </div>
-                                    </a>
-                                    <button class="hidden group-hover:block" @click="viewFile(file)">
-                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
-                                            <EyeIcon class="w-5 h-5 fill-black aria-hidden" aria-hidden="true" />
-                                        </div>
-                                    </button>
-
-                                    <Dropdown class="absolute" align="right" width="48">
-                                        <template #trigger>
-                                            <button>
-                                                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
-                                                    <EllipsisVerticalIcon class="w-5 h-5 fill-black aria-hidden" aria-hidden="true" />
-                                                </div>
-                                            </button>
-                                        </template>
-
-                                        <template #content>
-                                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
-                                                <li>
-                                                    <DropdownLink :href="route('files.edit', {id: file.id})"> Edit </DropdownLink>
-                                                </li>
-                                                <li>
-                                                    <div class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer" @click="openRenameModal(file.id, file.file_name, i)">Rename</div>
-                                                </li>
-                                                <li>
-                                                    <div class="block w-full px-4 py-2 text-left text-sm leading-5 text-red-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer" @click="deleteFile(file.id)">Delete</div>
-                                                </li>
-                                            </ul>
-                                        </template>
-                                    </Dropdown>
-                                </div>
-                            </div> -->
                         </div>
                     </div>
                 </div>

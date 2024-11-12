@@ -13,7 +13,7 @@ class thumbnail:
     top_half = image.crop((0, 0, width, height // 2))
     reduced_image = top_half.resize((top_half.width // 8, top_half.height // 8))
     buffered = BytesIO()
-    reduced_image.save(buffered, format="PNG")
+    reduced_image.save(buffered, format="WEBP")
     img_byte = buffered.getvalue()
     thumbnail = base64.b64encode(img_byte).decode('utf-8')
 

@@ -51,7 +51,7 @@ class ProcessFileContent implements ShouldQueue
             $this->logError($file->id, $er, 'File Content Unreadable');
         }
 
-        $file->update(['processed' => true])->searchable();
+        $file->update(['processed' => true]);
 
     }
 

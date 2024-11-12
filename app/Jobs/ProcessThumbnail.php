@@ -35,6 +35,8 @@ class ProcessThumbnail implements ShouldQueue
 
         }
 
+        $py->throw();
+
         $res = $py->output();
         $er = $py->errorOutput();
 

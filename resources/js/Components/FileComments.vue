@@ -97,8 +97,8 @@ const deleteComment = (id) => {
 <template>
 
 <button @click="openCommentsModal()">
-    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
-        <ChatBubbleBottomCenterIcon class="w-5 h-5 fill-none stroke-black stroke-2 aria-hidden" aria-hidden="true" />
+    <div class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer">
+        Comments
     </div>
 </button>
 
