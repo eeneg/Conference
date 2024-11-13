@@ -374,7 +374,10 @@
                     <div class="pr-1 pl-1 mt-2 group">
                         <div class="flex flex-wrap">
                             <div class="basis-1/4 py-3 px-2" v-for="(file, i) in files.data">
-                                <div class="border rounded py-2 px-4 max-w-[18rem] h-[18rem]" :class="[file.processed ? 'bg-slate-200' : 'bg-red-200']">
+                                <div
+                                    class="border rounded py-2 px-4 max-w-[18rem] h-[18rem]"
+                                    :class="[file.processed == false ? 'bg-yellow-200' : file.file_error ? 'bg-red-200' : 'bg-slate-200']"
+                                >
                                     <div class="flex flex-col space-y-2">
                                         <div class="flex flex-row justify-between">
                                             <div class="flex flex-col">
@@ -398,12 +401,13 @@
                                                     <template #content>
                                                         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
                                                             <li>
-                                                                <div
+                                                                <a
                                                                     class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
-                                                                    @click="downloadFile(file.id, file.file_name)"
+                                                                    :href="'/downloadFile/'+file.id"
                                                                 >
+                                                                    <!-- @click="downloadFile(file.id, file.file_name)" -->
                                                                     Download
-                                                                </div>
+                                                                </a>
                                                             </li>
                                                             <li>
                                                                 <div

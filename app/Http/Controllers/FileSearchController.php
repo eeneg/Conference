@@ -21,6 +21,7 @@ class FileSearchController extends Controller
                 ->with('category')
                 ->with('storage')
                 ->with('thumbnail')
+                ->with('fileError')
                 ->orderBy('created_at', 'desc')
                 ->paginate(15),
             'for_review' => File::where('latest', true)

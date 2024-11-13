@@ -30,7 +30,7 @@ const props = defineProps({storage:Object, category:Object, file: Object})
                             </header>
                         </div>
                     </div>
-                    <SingleFileUpload :storage="props.storage" :category="props.category" :file="props.file"/>
+                    <SingleFileUpload :storage="props.storage" :category="props.category"/>
                 </div>
                 <div class="basis-1/2">
                     <div class="flex flex-row">
@@ -44,7 +44,7 @@ const props = defineProps({storage:Object, category:Object, file: Object})
                             </header>
                         </div>
                     </div>
-                    <MultipleFileUpload :storage="props.storage" :files="props.files"/>
+                    <MultipleFileUpload :storage="props.storage" :category="props.category"/>
                 </div>
             </div>
         </div>

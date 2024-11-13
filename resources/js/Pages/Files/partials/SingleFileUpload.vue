@@ -11,7 +11,7 @@
     import InputError from '@/Components/InputError.vue';
     import { onMounted } from 'vue';
 
-    const props = defineProps({storage:Object, category:Object, file: Object})
+    const props = defineProps({storage:Object, category:Object})
 
     const editMode = ref(false)
 
@@ -42,7 +42,6 @@
                 success = true
                 message = "File Uploaded Successfuly"
                 modalShow.value = true
-                // form.reset()
                 submitErrorMsg.value = ''
                 document.getElementById('files').value = ''
             },
@@ -115,12 +114,6 @@
         });
     }
 
-    const editData = () => {
-        if(props.file){
-            return props.file.category
-        }
-    }
-
     const redirectBack = () => {
         router.visit(route('file.index'))
     }
@@ -178,7 +171,7 @@
                 </div>
                 <div class="flex flex-row space-x-2">
                     <div class="w-full">
-                        <Combobox @passData ="getCategoryId($event)" :selected="editData()" :data="props.category"></Combobox>
+                        <Combobox @passData ="getCategoryId($event)" :data="props.category"></Combobox>
                     </div>
                 </div>
                 <InputError :message="form.errors.category_id" class="mt-2" />

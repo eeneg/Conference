@@ -45,7 +45,7 @@ class MultipleFileUploadController extends Controller
             Storage::disk('local')->putFileAs('public/Temp_File_Storage/', $file, $file->hashName());
         }
 
-        $this->multipleFileUploadService->handle($create);
+        $this->multipleFileUploadService->handle($create, $request->input('category_id'));
     }
 
     public function checkDuplicateFileName(Request $request){
@@ -63,7 +63,6 @@ class MultipleFileUploadController extends Controller
                 array_push($file_names, $file->getClientOriginalName());
             }
         }
-
 
         $files = File::whereIn('file_name', $file_names)->get('file_name');
 

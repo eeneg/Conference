@@ -7,8 +7,10 @@ import InputError from '@/Components/InputError.vue';
 import Modal from '@/Components/Modal.vue';
 import { ref } from 'vue';
 import axios, { all } from 'axios';
+import { XCircleIcon } from '@heroicons/vue/20/solid';
+import Combobox  from '@/Components/ComboBox.vue';
 
-const props = defineProps({files: Object, storage: Object})
+const props = defineProps({file: Object, storage: Object, category: Object})
 
 var header = ""
 var message = ""
@@ -18,6 +20,7 @@ const modalShow = ref(false)
 
 const form = useForm({
     storage_id: null,
+    category_id: [],
     files: null
 })
 
@@ -59,6 +62,7 @@ const uploadFiles = () => {
         modalShow.value = true
         header = "Success!"
         success = true
+        form.reset()
         message = "Files Uploaded Successfuly"
         form.reset()
     }).catch((error) => {
@@ -66,16 +70,25 @@ const uploadFiles = () => {
     })
 }
 
+const getCategoryId = (id) => {
+    form.category_id = id
+}
+
+const removeCategoryId = (category) => {
+    form.category_id.splice(category, 1)
+}
+
+
 </script>
 
 <template>
-    <div class="mt-3 mb-3 pr-6 pl-5">
+    <div class="mb-3 pr-6 pl-5 space-y-6">
         <div>
             <InputLabel>Multiple Files</InputLabel>
             <input class="mb-3" type="file" @change="processFiles($event)" @click="resetDuplicateFileList()" multiple accept="application/pdf">
             <InputError :message="errors.files" class="mt-2" />
         </div>
-        <div class="mt-3">
+        <div class="">
             <InputLabel>Storage Location</InputLabel>
             <select v-model="form.storage_id" name="storage_id" id="storage_id" class="border w-full rounded text-gray-700 border-gray-300">
                 <option :value="null" selected>---</option>
@@ -83,7 +96,30 @@ const uploadFiles = () => {
             </select>
             <InputError :message="errors.storage_id" class="mt-2" />
         </div>
-        <div class="mt-5">
+        <div class="flex flex-col">
+            <div class="flex flex-row justify-between">
+                <InputLabel>Category (e.g. Ordinances, Resolutions)</InputLabel>
+                <p style="line-height: 2; font-size: 11px;" class="float-right">
+                    Not Enough Categories?
+                    <a class="text-indigo-900 underline" style="font-size: 11px;" :href="'/settings/category'" :active="route().current('files.*')">
+                        Add Here
+                    </a>
+                </p>
+            </div>
+            <div class="flex flex-row space-x-2">
+                <div class="w-full">
+                    <Combobox @passData ="getCategoryId($event)" :data="props.category"></Combobox>
+                </div>
+            </div>
+            <InputError :message="form.errors.category_id" class="mt-2" />
+            <div class="flex flex-nowrap overflow-x-auto p-2 space-x-2 w-full">
+                <div v-for="(cat, i) in form.category_id" class="flex flex-shrink-0 rounded-full space-x-2 px-3 py-1 text-white bg-indigo-500 mt-2">
+                    <span>{{cat.title}}</span>
+                    <button class="rounded-full p-0" @click="removeCategoryId(i)"><XCircleIcon class="h-5 rounded-full hover:bg-indigo-900"></XCircleIcon></button>
+                </div>
+            </div>
+        </div>
+        <div class="">
             <PrimaryButton class="" @click="duplicateCheck">Upload</PrimaryButton>
         </div>
     </div>
