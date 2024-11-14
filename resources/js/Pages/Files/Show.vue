@@ -375,11 +375,11 @@
                         <div class="flex flex-wrap">
                             <div class="basis-1/4 py-3 px-2" v-for="(file, i) in files.data">
                                 <div
-                                    class="border rounded py-2 px-4 max-w-[18rem] h-[18rem]"
+                                    class="border rounded py-2 px-4 max-w-[18rem] h-[18rem] hover:bg-slate-300 cursor-pointer"
                                     :class="[file.processed == false ? 'bg-yellow-200' : file.file_error ? 'bg-red-200' : 'bg-slate-200']"
                                 >
                                     <div class="flex flex-col space-y-2">
-                                        <div class="flex flex-row justify-between">
+                                        <div class="flex space-x- flex-row justify-between">
                                             <div class="flex flex-col">
                                                 <div class="text-md max-w-[12rem] h-[1rem]">
                                                     <p class="truncate overflow-hidden ...">{{ file.title }}</p>
@@ -444,8 +444,9 @@
                                                 </Dropdown>
                                             </div>
                                         </div>
-                                        <div class="flex content-center justify-center rounded h-[10rem] bg-white">
-                                            <img :src="'data:image/png;base64,'+file.thumbnail?.base64_thumbnail" alt="">
+                                        <div @click="viewFile(file)" class="flex group/item items-center justify-center rounded h-[10rem] bg-white/30 relative">
+                                            <img class="group-hover/item:blur-sm" :src="'data:image/png;base64,'+file.thumbnail?.base64_thumbnail" alt="">
+                                            <EyeIcon class="h-8 w-8 absolute fill-none stroke-slate-900 stroke-1 invisible group-hover/item:visible"/>
                                         </div>
                                         <div class="flex flex-row justify-between p-0">
                                             <div class="flex flex-col p-0">

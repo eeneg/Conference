@@ -18,20 +18,17 @@ class FileViewController extends Controller
             abort(404, 'File not found');
         }
 
-        $file = Storage::download($filePath);
+        $fileStream = Storage::readStream($filePath);
+        $fileMimeType = Storage::mimeType($filePath);
+        $fileSize = Storage::size($filePath);
 
-        return $file;
-        // $fileStream = Storage::readStream($filePath);
-        // $fileMimeType = Storage::mimeType($filePath);
-        // $fileSize = Storage::size($filePath);
-
-        // return Response::stream(function () use ($fileStream) {
-        //     fpassthru($fileStream);
-        // }, 200, [
-        //     'Content-Type' => $fileMimeType,
-        //     'Content-Length' => $fileSize,
-        //     'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"',
-        // ]);
+        return Response::stream(function () use ($fileStream) {
+            fpassthru($fileStream);
+        }, 200, [
+            'Content-Type' => $fileMimeType,
+            'Content-Length' => $fileSize,
+            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"',
+        ]);
     }
 
     public function referenceView($id){
