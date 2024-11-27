@@ -32,8 +32,12 @@ return [
 
         'azure' => [
             'driver'    => 'azure-storage-blob',
-            'connection_string' => env('AZURE_STORAGE_CONNECTION_STRING'),
+            'name'      => env('AZURE_STORAGE_NAME'),
+            'key'       => env('AZURE_STORAGE_KEY'),
             'container' => env('AZURE_STORAGE_CONTAINER'),
+            'url'       => env('AZURE_STORAGE_URL'),
+            'prefix'    => null,
+            'connection_string' => env('AZURE_STORAGE_CONNECTION_STRING'),
         ],
 
         'local' => [
