@@ -18,7 +18,7 @@ return new class extends Migration
                 ->references('id')
                 ->on('files')
                 ->onDelete('cascade');
-            $table->string('verbose');
+            $table->text('verbose');
             $table->string('remark');
             $table->timestamps();
         });
