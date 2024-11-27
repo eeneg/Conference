@@ -6,7 +6,7 @@ import spacy
 class processAttachent:
 
     res = ""
-    pdf = '/var/www/html/storage/app/public/'+sys.argv[1]
+    pdf = '/var/www/html/conference/storage/app/public/'+sys.argv[1]
     pdf_info = pdfinfo_from_path(pdf, userpw=None, poppler_path=None)
     nlp = spacy.load("en_core_web_sm")
     max_pages = 15
