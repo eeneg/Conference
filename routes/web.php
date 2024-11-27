@@ -22,6 +22,7 @@ use App\Http\Controllers\FileViewController;
 use App\Http\Controllers\ManualAttendanceController;
 use App\Http\Controllers\MultipleFileUploadController;
 use App\Http\Middleware\IsAdmin;
+use App\Models\FileCategory;
 use App\Models\Message;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -98,6 +99,9 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::post('/deleteAttendance', [ConferenceAttendanceController::class, 'delete'])->name('attendance.delete');
     Route::get('/searchUserBoardMember', [ConferenceAttendanceController::class, 'searchBM'])->name('search.bm');
     Route::get('/getVideoConfURL/{id}', [ConferenceController::class, 'getVideoConfURL'])->name('conf.url');
+
+    Route::post('/editCategory', [FileController::class, 'editCategory'])->name('fileCategories.edit');
+    Route::post('/editStorage', [FileController::class, 'editStorage'])->name('fileStorage.edit');
 
     Route::get('/allChat', function(){
         return Message::all();

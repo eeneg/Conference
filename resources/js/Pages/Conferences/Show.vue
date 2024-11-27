@@ -63,14 +63,7 @@ const title = computed(() => embed.value?.is_previewable ? `${action.value} ${em
 const reembed = (attachment) =>{
     if(embed.value == null || embed.value.id != attachment.id)
     {
-        axios.get(`/viewBlobPDF/${attachment.id}`)
-        .then(e => {
-            embed.value = embed.value === attachment ? null : attachment
-            embed.value.pdf = e.data
-        })
-        .catch(e => {
-            console.log(e)
-        })
+        embed.value = attachment
     }
 }
 
@@ -194,13 +187,15 @@ const inputSave = _.debounce(() => {
                                         </template>
 
                                         <template v-else-if="! embed.is_previewable">
-                                            <p class="">
-                                                File is not previewable in browser. You can download it by clicking the link below.
-                                            </p>
+                                            <div>
+                                                <p class="">
+                                                    File is not previewable in browser. You can download it by clicking the link below.
+                                                </p>
 
-                                            <a :href="url" class="italic text-indigo-700 underline">
-                                                {{ embed.file_name }}
-                                            </a>
+                                                <a :href="`/downloadFile/`+embed.id" class="italic text-indigo-700 underline">
+                                                    {{ embed.file_name }}
+                                                </a>
+                                            </div>
                                         </template>
 
                                         <template v-else>
@@ -224,7 +219,7 @@ const inputSave = _.debounce(() => {
                                         v-if="embed != null"
                                         class="w-full h-full rounded-lg"
                                         :class="[]"
-                                        :src="'data:application/pdf;base64,'+embed.pdf"
+                                        :src="`/viewBlobPDF/`+embed.id"
                                     >
                                 </div>
                             </div>

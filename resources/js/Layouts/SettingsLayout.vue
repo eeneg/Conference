@@ -17,12 +17,12 @@
     <Head title="Attachments" />
 
     <header class="bg-white shadow">
-        <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="px-4 py-6 mx-auto max-w-[90rem] sm:px-6 lg:px-8">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Settings</h2>
         </div>
     </header>
 
-    <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 flex md:flex-row sm:flex-col min-[300px]:flex-col">
+    <div class="mx-auto max-w-[90rem] sm:px-6 lg:px-8 flex md:flex-row sm:flex-col min-[300px]:flex-col">
 
         <div class="md:basis-1/5 py-5">
             <ul class="space-y-2">

@@ -13,8 +13,6 @@
 
     const props = defineProps({storage:Object, category:Object})
 
-    const editMode = ref(false)
-
     const form = useForm({
         id: null,
         file: {},
@@ -63,42 +61,9 @@
         form.category_id.splice(category, 1)
     }
 
-    const update = () => {
-        form.submit('patch', route('files.update', {id:form.id}),{
-            onSuccess: () =>{
-                header = "Success!"
-                success = true
-                message = "File Updated"
-                modalShow.value = true
-                submitErrorMsg.value = ''
-            },
-            onError: (e) => {
-                header = "Error!"
-                success = false
-                message = "Something went wrong"
-                modalShow.value = true
-                console.log(e)
-            }
-        })
-    }
-
-    const deleteFile = () => {
-        form.submit('delete', route('files.destroy'),{
-            onSuccess: () =>{
-
-            },
-            onError: () => {
-
-            }
-        })
-    }
-
     const fileCheck = () => {
-        if(editMode.value){
-            update()
-        }else{
+
             submit()
-        }
     }
 
     const closeModal = () => {
@@ -114,23 +79,15 @@
         });
     }
 
-    const redirectBack = () => {
-        router.visit(route('file.index'))
-    }
-
     onMounted(() => {
-        if(props.file != null){
-            editMode.value = true
-            form.category_id = props.file.category
-            Object.assign(form, props.file)
-        }
+
     })
 
 </script>
 <template>
     <div class="mt-3 mb-3 pr-6 pl-5">
         <div class="space-y-6">
-            <div class="" v-if="editMode == false">
+            <div class="">
                 <InputLabel>Upload a File</InputLabel>
                 <input v-on:change="getFiles($event, i)" type="file" id="files" class="rounded bg-white-200" accept="application/pdf"   />
                 <InputError :message="form.errors.file" class="mt-2"/>
@@ -209,19 +166,7 @@
             </p>
 
             <div class="flex">
-                <div class="flex basis-full mt-2 space-x-2" v-if="editMode">
-                    <SecondaryButton
-                        class="w-full mt-2 place-content-center"
-                        @click="redirectBack()">
-                            <p>Back</p>
-                    </SecondaryButton>
-                    <PrimaryButton
-                        class="w-full mt-2 place-content-center"
-                        @click="closeModal">
-                            <p>OK</p>
-                    </PrimaryButton>
-                </div>
-                <div class="basis-full mt-2" v-else="editMode == false">
+                <div class="basis-full mt-2">
                     <PrimaryButton
                         class="w-full mt-2 place-content-center"
                         @click="closeModal">

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('file_name');
             $table->date('date')->nullable();
             $table->string('hash_name');
-            $table->string('details')->nullable();
+            $table->text('details')->nullable();
             $table->boolean('for_review')->default(false);
             $table->boolean('latest')->default(true);
             $table->boolean('processed')->default(false);

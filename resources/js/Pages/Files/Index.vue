@@ -10,13 +10,13 @@ const props = defineProps({storage:Object, category:Object, file: Object})
 <template>
     <Head title="Files" />
     <header class="bg-white shadow">
-        <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="px-4 py-6 mx-auto max-w-[90rem] sm:px-6 lg:px-8">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Files</h2>
         </div>
     </header>
 
     <div class="py-5">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-[90rem] sm:px-6 lg:px-8">
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg flex flex-row">
                 <div class="basis-1/2">
                     <div class="flex flex-row">

@@ -10,14 +10,19 @@
     import InputError from '@/Components/InputError.vue';
     import InputLabel from '@/Components/InputLabel.vue';
     import FileComments from '@/Components/FileComments.vue';
-    import { ArrowDownTrayIcon, DocumentIcon, Bars3Icon, EyeIcon, CheckIcon } from '@heroicons/vue/20/solid';
+    import { DocumentIcon, Bars3Icon, EyeIcon, CheckIcon, ArrowDownTrayIcon, ChevronUpIcon, XCircleIcon } from '@heroicons/vue/20/solid';
     import { useForm } from '@inertiajs/vue3';
     import { ref } from 'vue';
     import { router } from '@inertiajs/vue3'
     import axios from 'axios';
     import _ from 'lodash';
     import Dropdown from '@/Components/Dropdown.vue';
-    import DropdownLink from '@/Components/DropdownLink.vue';
+    import {
+        Combobox,
+        Disclosure,
+        DisclosureButton,
+        DisclosurePanel,
+    } from '@headlessui/vue'
 
     const props = defineProps({files: Object, storage: Object, category: Object, for_review:Object})
 
@@ -32,6 +37,12 @@
     const loading = ref(false)
 
     const pdfModalShow = ref(false)
+
+    const selectedFiles = ref([])
+
+    const selectedCategory = ref([])
+
+    const selectedStorage = ref(null)
 
     const responseModal = ref(false)
     var header = ""
@@ -108,19 +119,12 @@
     const pdfTitle = ref(null)
     const pdfDetails = ref(null)
     const viewFile = (file) => {
-
-        // axios.get(`/viewBlobPDF/${file.id}`)
-        // .then((e) => {
         path.value = file.id
         file_id.value = file.id
         review_status.value = file.for_review == true ? false : true
         pdfTitle.value = file.title
         pdfDetails.value = file.details
         pdfModalShow.value = true
-        // })
-        // .catch(e => {
-        //     console.log(e)
-        // })
     }
 
     const renameForm = useForm({
@@ -240,31 +244,99 @@
         deleteForeverModal.value = false
     }
 
-    const downloadFile = (id, file_name) => {
-        axios.get(route('file.download', {id:id}), { responseType: 'blob' })
-        .then((response) => {
-            const url = window.URL.createObjectURL(new Blob([response.data], {type: 'application/pdf'}))
-            const tempLink = document.createElement('a')
-            tempLink.href = url
-            tempLink.setAttribute('download', file_name)
-            document.body.appendChild(tempLink)
-            tempLink.click()
-            document.body.removeChild(tempLink)
-            window.URL.revokeObjectURL(url)
+    const updateCategories = () => {
+        if(selectedCategory.value.length > 0 && selectedFiles.value.length > 0){
+            axios.post(route('fileCategories.edit'), {files: selectedFiles.value, categories: selectedCategory.value})
+            .then(({data}) => {
+                header = 'Success'
+                message = 'Categories Updated Successfully'
+                success = true
+                responseModal.value = true
+            })
+            .catch(e => {
+                header = 'Error'
+                message = 'Something went wrong'
+                success = false
+                responseModal.value = true
+            })
+        }else{
+            console.log(selectedCategory.value)
+        }
+    }
+
+    const updateStorage = () => {
+        if(selectedStorage != null && selectedFiles.value.length > 0){
+            axios.post(route('fileStorage.edit'), {files: selectedFiles.value, storage: selectedStorage.value})
+            .then(({data}) => {
+                header = 'Success'
+                message = 'File Transfered Successfully'
+                success = true
+                responseModal.value = true
+            })
+            .catch(e => {
+                header = 'Error'
+                message = 'Something went wrong'
+                success = false
+                responseModal.value = true
+            })
+        }else{
+            console.log(selectedCategory.value)
+        }
+    }
+
+    const fileForm = useForm({
+        id: null,
+        title: null,
+        storage_id: null,
+        category_id: [],
+        date: null,
+        details: null,
+        sorted: true,
+    })
+
+    const fileEditModal = ref(false)
+    const fileEditModalOpen = (file) => {
+        fileForm.id = file.id
+        fileForm.title = file.title
+        fileForm.details = file.details
+        fileForm.date = file.date
+        fileForm.storage_id = file.storage_id
+        fileForm.category_id = file.category
+        fileEditModal.value = true
+    }
+
+    const closeFileEditModal = () => {
+        fileEditModal.value = false
+    }
+
+    const editFile = () => {
+        fileForm.submit('patch', route('files.update', {id:fileForm.id}),{
+            onSuccess: () => {
+                header = 'Success'
+                message = 'File Updated Successfully'
+                success = true
+                responseModal.value = true
+                closeFileEditModal()
+            },
+            onError: () => {
+
+            }
         })
-        .catch(() => {
-            header = 'Error'
-            message = 'Error downloading file'
-            success = false
-            responseModal.value = true
-        })
+    }
+
+    const getEditCategoryId = (id) => {
+        fileForm.category_id = id
+    }
+
+    const removeCategoryId = (category) => {
+        fileForm.category_id.splice(category, 1)
     }
 </script>
 <template>
 
     <Head title="Find Files" />
     <header class="bg-white shadow">
-        <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="px-4 py-6 mx-auto max-w-[90rem] sm:px-6 lg:px-8">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Search Files</h2>
             <p class="mt-1 text-sm text-gray-600">
                 Searches Files via File Name, Storage, Content and Category (e.g. Ordinances, Resolutions)
@@ -273,8 +345,44 @@
     </header>
 
     <div class="py-5">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+        <div class="mx-auto max-w-[90rem] sm:px-6 lg:px-8 flex">
+            <div class="flex-none">
+                <div class="flex flex-col px-3">
+                    <div class="text-wrap break-normal">
+                        <div>
+                            <p>Update Categories:</p>
+                            <ul class="px-4 mt-2">
+                                <li v-for="category in props.category">
+                                    <div class="flex">
+                                        <input type="checkbox" v-model="selectedCategory" :id="category.id" :value="category.id" class="mr-2 mt-[3px]"/>
+                                        <p>{{ category.title }}</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="w-full">
+                            <SecondaryButton @click="updateCategories()" class="mt-2">Save</SecondaryButton>
+                        </div>
+                    </div>
+                    <div class="text-wrap break-normal mt-6">
+                        <div>
+                            <p>Transfer Storage:</p>
+                            <ul class="px-4 mt-2">
+                                <li v-for="storage in props.storage">
+                                    <div class="flex">
+                                        <input type="radio"  v-model="selectedStorage" id="storageCheckBox" :value="storage.id" class="mr-2 mt-[3px]"/>
+                                        <p>{{ storage.title }}</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="w-full">
+                            <SecondaryButton @click="updateStorage()" class="mt-2">Save</SecondaryButton>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="grow overflow-hidden bg-white shadow-sm sm:rounded-lg">
                 <div class="flex flex-row-reverse mt-3 pl-5 pr-5 space-x-2">
                     <div class="ml-3">
                         <SecondaryButton @click="reset">Reset</SecondaryButton>
@@ -322,49 +430,56 @@
                     </form>
                 </div>
                 <div class="grow pl-5 pr-5 text-sm mt-2 mb-4" v-if="for_review">
-                    <div class="mt-2">
-                        <h2 class="text-lg font-bold">For Review</h2>
-                        <hr>
-                    </div>
-                    <div class="max-h-80 overflow-auto rounded">
-                        <div class="border rounded p-2 pl-2 mt-2 group bg-indigo-100" v-for="(file, i) in for_review">
-                            <div class="flex items-center">
-                                <div class="flex items-center p-1 justify-center sm:text-sm">
-                                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-300 text-red-900">
-                                        <DocumentIcon class="w-5 h-5 stroke-gray-900 fill-none " aria-hidden="true" />
-                                    </div>
-                                </div>
-                                <div class="grow p-1 text-sm">
-                                    <div class="flex ml-2">
-                                        <p class="text-lg max-w-96 truncate float-left text-black-900">{{ file.file_name }}</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-center float-right space-x-1">
-                                    <div class="hidden group-hover:block">
-                                        <FileComments :file_id="file.id"/>
-                                    </div>
-                                    <div class="hidden group-hover:block">
-                                        <FileVersioncontrol @refreshData="reloadLatest($event)" :file_id="file.id"/>
-                                    </div>
-                                    <a class="hidden group-hover:block" :href="route('file.download',{ id:file.id })">
-                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-red-900">
-                                            <ArrowDownTrayIcon class="w-5 h-5 stroke-gray-900 fill-black " aria-hidden="true" />
+                    <Disclosure v-slot="{ open }">
+                        <DisclosureButton class="flex w-full justify-between rounded bg-indigo-100 px-4 py-2 text-left text-sm font-medium text-slate-900 hover:bg-indigo-200 focus:outline-none focus-visible:ring focus-visible:ring-indigo-500/75">
+                            <h2 class="text-lg font-bold float-left">For Review</h2>
+                            <ChevronUpIcon
+                                :class="open ? 'rotate-180 transform' : ''"
+                                class="h-5 w-5 text-purple-500"
+                            />
+                        </DisclosureButton>
+                        <DisclosurePanel class="text-gray-500">
+                            <div class="max-h-80 overflow-auto rounded">
+                                <div class="border rounded p-2 pl-2 mt-2 group bg-indigo-100" v-for="(file, i) in for_review">
+                                    <div class="flex items-center">
+                                        <div class="flex items-center p-1 justify-center sm:text-sm">
+                                            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-300 text-red-900">
+                                                <DocumentIcon class="w-5 h-5 stroke-gray-900 fill-none " aria-hidden="true" />
+                                            </div>
                                         </div>
-                                    </a>
-                                    <button class="hidden group-hover:block" @click="viewFile(file)">
-                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
-                                            <EyeIcon class="w-5 h-5 fill-black aria-hidden" aria-hidden="true" />
+                                        <div class="grow p-1 text-sm">
+                                            <div class="flex ml-2">
+                                                <p class="text-lg max-w-96 truncate float-left text-slate-900">{{ file.file_name }}</p>
+                                            </div>
                                         </div>
-                                    </button>
-                                    <button class="" @click="endForReview(file.id)">
-                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
-                                            <CheckIcon class="w-5 h-5 fill-black aria-hidden" aria-hidden="true" />
+                                        <div class="flex items-center justify-center float-right space-x-1">
+                                            <div class="hidden group-hover:block">
+                                                <FileVersioncontrol @refreshData="reloadLatest($event)" :file_id="file.id" :for_review="true"/>
+                                            </div>
+                                            <div class="hidden group-hover:block">
+                                                <FileComments :file_id="file.id" :for_review="true"/>
+                                            </div>
+                                            <a class="hidden group-hover:block" :href="route('file.download',{ id:file.id })">
+                                                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-red-900">
+                                                    <ArrowDownTrayIcon class="w-5 h-5 fill-white " aria-hidden="true" />
+                                                </div>
+                                            </a>
+                                            <button class="hidden group-hover:block" @click="viewFile(file)">
+                                                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
+                                                    <EyeIcon class="w-5 h-5 fill-white aria-hidden" aria-hidden="true" />
+                                                </div>
+                                            </button>
+                                            <button class="" @click="endForReview(file.id)">
+                                                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
+                                                    <CheckIcon class="w-5 h-5 fill-white aria-hidden" aria-hidden="true" />
+                                                </div>
+                                            </button>
                                         </div>
-                                    </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </DisclosurePanel>
+                    </Disclosure>
                 </div>
                 <div class="grow pl-5 pr-5 pb-40 text-sm min-h-20 max-h-screen overflow-auto" @scroll="onScroll" group="file">
                     <div>
@@ -378,17 +493,20 @@
                                     class="border rounded py-2 px-4 max-w-[18rem] h-[18rem] hover:bg-slate-300 cursor-pointer"
                                     :class="[file.processed == false ? 'bg-yellow-200' : file.file_error ? 'bg-red-200' : 'bg-slate-200']"
                                 >
-                                    <div class="flex flex-col space-y-2">
-                                        <div class="flex space-x- flex-row justify-between">
+                                    <div class="flex flex-col space-y-3">
+                                        <div class="flex flex-row justify-between">
+                                            <div class="p-0">
+                                                <input type="checkbox" v-model="selectedFiles" :id="i" :value="file.id"/>
+                                            </div>
                                             <div class="flex flex-col">
-                                                <div class="text-md max-w-[12rem] h-[1rem]">
+                                                <div class="text-md max-w-[11rem] h-[1rem]">
                                                     <p class="truncate overflow-hidden ...">{{ file.title }}</p>
                                                 </div>
-                                                <div class="text-sm max-w-[12rem]">
+                                                <div class="text-sm max-w-[11rem] h-[1rem]">
                                                     <p class="truncate overflow-hidden ...">{{ file.file_name }}</p>
                                                 </div>
                                             </div>
-                                            <div class="">
+                                            <div class="p-0">
                                                 <Dropdown class="absolute" align="right" width="48">
                                                     <template #trigger>
                                                         <button>
@@ -401,11 +519,18 @@
                                                     <template #content>
                                                         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
                                                             <li>
+                                                                <div
+                                                                    class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
+                                                                    @click="fileEditModalOpen(file)"
+                                                                >
+                                                                    Edit
+                                                            </div>
+                                                            </li>
+                                                            <li>
                                                                 <a
                                                                     class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
                                                                     :href="'/downloadFile/'+file.id"
                                                                 >
-                                                                    <!-- @click="downloadFile(file.id, file.file_name)" -->
                                                                     Download
                                                                 </a>
                                                             </li>
@@ -413,14 +538,14 @@
                                                                 <div
                                                                     class="block w-full text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
                                                                 >
-                                                                        <FileComments :file_id="file.id"/>
+                                                                    <FileComments :file_id="file.id" :for_review="false"/>
                                                                 </div>
                                                             </li>
                                                             <li>
                                                                 <div
                                                                     class="block w-full text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
                                                                 >
-                                                                    <FileVersioncontrol @refreshData="reloadLatest($event)" />
+                                                                    <FileVersioncontrol @refreshData="reloadLatest($event)" :file_id="file.id" :for_review="false"/>
                                                                 </div>
                                                             </li>
                                                             <li>
@@ -445,7 +570,7 @@
                                             </div>
                                         </div>
                                         <div @click="viewFile(file)" class="flex group/item items-center justify-center rounded h-[10rem] bg-white/30 relative">
-                                            <img class="group-hover/item:blur-sm" :src="'data:image/png;base64,'+file.thumbnail?.base64_thumbnail" alt="">
+                                            <img class="group-hover/item:scale-75 transition ease-in-out" :src="'data:image/png;base64,'+file.thumbnail?.base64_thumbnail" alt="">
                                             <EyeIcon class="h-8 w-8 absolute fill-none stroke-slate-900 stroke-1 invisible group-hover/item:visible"/>
                                         </div>
                                         <div class="flex flex-row justify-between p-0">
@@ -457,9 +582,9 @@
                                                 </div>
                                                 <div class="text-sm text-gray-600 text-sm max-w-[12rem]">
                                                 <p class="truncate overflow-hidden ...">
-                                                        {{
-                                                            file.category.map(e => e.title.charAt(0).toUpperCase() + e.title.slice(1)).join(', ')
-                                                        }}
+                                                    {{
+                                                        file.category.map(e => e.title.charAt(0).toUpperCase() + e.title.slice(1)).join(', ')
+                                                    }}
                                                 </p>
                                                 </div>
                                             </div>
@@ -480,14 +605,22 @@
                 {{ pdfTitle }}
             </div>
 
-            <div class="mt-2" style="height: 40rem;">
-                <iframe :src="`/viewBlobPDF/`+path" style="width: 100%; height: 100%;"  type="application/pdf"></iframe>
+            <div class="mt-2 flex items-center justify-center" style="height: 40rem;">
+                <iframe class="z-50" :src="`/viewBlobPDF/`+path" style="width: 100%; height: 100%;"  type="application/pdf"></iframe>
+                <div class="absolute flex flex-col items-center justify-center">
+                    <div>
+                        <svg aria-hidden="true" class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-indigo-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/><path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/></svg>
+                    </div>
+                    <div>
+                        Loading...
+                    </div>
+                </div>
             </div>
 
             <div class="mt-4">
                 Details:
             </div>
-            <div class="mt-1 text-gray-800 p-2 max-h-24 overflow-auto border rounded">
+            <div class="mt-1 text-gray-800">
                 {{ pdfDetails }}
             </div>
 
@@ -530,7 +663,7 @@
             <div class="flex flex-col mt-4">
                 <div class="basis-full">
                     <InputLabel for="file_name">File Name</InputLabel>
-                    <TextInput @input="resetRenameError()" name="file_name" id="file_name" class="w-full" v-model="renameForm.file_name"/>
+                    <TextInput name="file_name" id="file_name" class="w-full" v-model="file.file_name"/>
                     <InputError :message="renameForm.errors.file_name" class="mt-2" />
                     <Transition enter-from-class="opacity-0" leave-to-class="opacity-0" class="transition ease-in-out float-right">
                         <p v-if="renameForm.recentlySuccessful" class="text-sm text-gray-600">Saved.</p>
@@ -601,6 +734,82 @@
                 >
                     Delete File
                 </DangerButton>
+            </div>
+        </div>
+    </Modal>
+
+    <Modal :show="fileEditModal" @close="closeFileEditModal">
+        <div class="p-6">
+            <h2 class="text-lg font-medium text-gray-900">
+                Edit File
+            </h2>
+
+            <p class="mt-1 text-sm text-gray-600">
+                Iput the new details of the file
+            </p>
+
+            <div class="flex flex-col mt-4 space-y-4">
+                <div class="">
+                    <InputLabel>Title</InputLabel>
+                    <TextInput type="text" id="title" v-model="fileForm.title" class="w-full" placeholder="Insert Title"/>
+                    <InputError :message="fileForm.errors.title" class="mt-2"/>
+                </div>
+                <div class="flex flex-col">
+                    <div class="flex flex-row justify-between">
+                        <InputLabel>Storage Location</InputLabel>
+                        <p style="line-height: 2; font-size: 11px;" class="float-right">
+                            Not Enough Storage Locations?
+                            <a class="text-indigo-900 underline" style="font-size: 11px;" :href="'/settings/storage'" :active="route().current('files.*')">
+                                Add Here
+                            </a>
+                        </p>
+                    </div>
+                    <div>
+                        <select v-model="fileForm.storage_id" name="storage_id" id="storage_id" class="border w-full rounded text-gray-700 border-gray-300">
+                            <option :value="null" selected>---</option>
+                            <option :value="storage.id" v-for="storage in props.storage">{{ storage.title.charAt(0).toUpperCase() + storage.title.slice(1) }}</option>
+                        </select>
+                    </div>
+                    <InputError :message="fileForm.errors.storage_id" class="mt-2" />
+                </div>
+                <div class="flex flex-col">
+                    <div class="flex flex-row justify-between">
+                        <InputLabel>Category (e.g. Ordinances, Resolutions)</InputLabel>
+                        <p style="line-height: 2; font-size: 11px;" class="float-right">
+                            Not Enough Categories?
+                            <a class="text-indigo-900 underline" style="font-size: 11px;" :href="'/settings/category'" :active="route().current('files.*')">
+                                Add Here
+                            </a>
+                        </p>
+                    </div>
+                    <div class="flex flex-row space-x-2">
+                        <div class="w-full">
+                            <ComboBox @passData ="getEditCategoryId($event)" :data="props.category" :selected="fileForm.category_id"></ComboBox>
+                        </div>
+                    </div>
+                    <InputError :message="fileForm.errors.category_id" class="mt-2" />
+                    <div class="flex flex-nowrap overflow-x-auto p-2 space-x-2 w-full">
+                    <div v-for="(cat, i) in fileForm.category_id" class="flex flex-shrink-0 rounded-full space-x-2 px-3 py-1 text-white bg-indigo-500 mt-2">
+                        <span>{{cat.title}}</span>
+                        <button class="rounded-full p-0" @click="removeCategoryId(i)"><XCircleIcon class="h-5 rounded-full hover:bg-indigo-900"></XCircleIcon></button>
+                    </div>
+                </div>
+                </div>
+                <div class="">
+                    <InputLabel>Date</InputLabel>
+                    <input type="date" id="date" v-model="fileForm.date" class="rounded border-gray-300 w-full"/>
+                    <InputError :message="fileForm.errors.date" class="mt-2" />
+                </div>
+                <div class="">
+                    <InputLabel>Details</InputLabel>
+                    <textarea v-model="fileForm.details" class="w-full rounded border-gray-300 h-24" type="text" placeholder="Insert Details"></textarea>
+                    <InputError :message="fileForm.errors.details" class="mt-2" />
+                </div>
+            </div>
+
+            <div class="mt-6 flex space-x-2">
+                <SecondaryButton @click="closeFileEditModal"> Cancel </SecondaryButton>
+                <PrimaryButton @click="editFile()">Save</PrimaryButton>
             </div>
         </div>
     </Modal>

@@ -100,13 +100,13 @@ import InputError from '@/Components/InputError.vue';
     <Head title="Users" />
 
     <header class="bg-white shadow">
-        <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="px-4 py-6 mx-auto max-w-[90rem] sm:px-6 lg:px-8">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Users</h2>
         </div>
     </header>
 
     <div class="py-5">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-[90rem] sm:px-6 lg:px-8">
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                 <div class="pl-6 pr-6 mt-3 grow flex justify-between">
                     <div>

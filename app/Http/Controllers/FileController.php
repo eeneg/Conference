@@ -89,6 +89,24 @@ class FileController extends Controller
         $file->load('category')->searchable();
     }
 
+    public function editCategory(Request $request){
+        $files = File::whereIn('id', $request->input('files'))->get();
+
+        foreach($files as $file){
+            $file->category()->sync($request->input('categories'));
+        }
+
+    }
+
+    public function editStorage(Request $request){
+        $files = File::whereIn('id', $request->input('files'))->get();
+
+        foreach($files as $file){
+            $file->update(['storage_id' => $request->input('storage')]);
+        }
+
+    }
+
     public function renameFile(Request $request, $id){
 
         $request->validate([
@@ -113,11 +131,7 @@ class FileController extends Controller
      */
     public function edit(string $id)
     {
-        return Inertia::render('Files/Index', [
-            'storage' => Storage::all(),
-            'category' => Category::where("type", "1")->get(),
-            'file' => File::with(['category'])->find($id)
-        ]);
+
     }
 
     /**
@@ -127,12 +141,10 @@ class FileController extends Controller
     {
         $request->validate([
             'title' => 'required:|unique:files,title,'.$id,
-            'storage_id' => 'required',
-            'category_id' => 'required|array',
-            'category_id.*' => 'array',
-            'category_id.*.id' => 'required|string|uuid|exists:categories,id',
             'date' => 'required',
             'details' => 'required',
+            'storage_id' => 'required',
+            'category_id' => 'required|array',
         ],[
             'storage_id.required' => 'Storage Field in required',
             'category_id.required' => 'Category Field in required',

@@ -10,7 +10,7 @@ import axios from 'axios';
 import moment from 'moment';
 
 
-const props = defineProps({file_id:String})
+const props = defineProps({file_id:String, for_review:Boolean})
 const user = usePage().props.auth.user.id
 const comments = ref([])
 
@@ -97,8 +97,11 @@ const deleteComment = (id) => {
 <template>
 
 <button @click="openCommentsModal()">
-    <div class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer">
-        Comments
+    <div v-if="!props.for_review" class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer">
+        <p>Comments</p>
+    </div>
+    <div v-else class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
+        <ChatBubbleBottomCenterIcon class="w-5 h-5 fill-white aria-hidden"/>
     </div>
 </button>
 

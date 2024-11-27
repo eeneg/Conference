@@ -42,13 +42,13 @@ const submit = () => {
     <Head title="Dashboard" />
                 <!-- Page Heading -->
     <header class="bg-white shadow">
-        <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="px-4 py-6 mx-auto max-w-[90rem] sm:px-6 lg:px-8">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>
         </div>
     </header>
 
     <div class="pt-6 pb-2">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-[90rem] mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <div class="flex justify-center space-x-9">
@@ -119,7 +119,7 @@ const submit = () => {
     </div>
 
     <div class="pt-3 pb-2">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-[90rem] mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="flex flex-col px-6 pt-6 pb-3 text-gray-900">
                     <div class="text-lg font-bold flex justify-between">
@@ -162,7 +162,7 @@ const submit = () => {
     </div>
 
     <div class="pt-3 pb-2">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-[90rem] mx-auto sm:px-6 lg:px-8">
             <div class="flex space-x-2 min-h-[30em]">
                 <div class="basis-1/2 bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="flex flex-col p-6">
@@ -196,7 +196,7 @@ const submit = () => {
                             </div>
                         </div>
                         <div class="grow flex flex-col mt-3 divide-y divide-slate-700 border-t-2 border-black max-h-[25em] overflow-auto">
-                            <div class="w-full flex flex-col py-2" v-for="file in files_review">
+                            <div class="w-full flex flex-col py-2 mt-2" v-for="file in files_review">
                                 <div class="">
                                     {{ file.file_name }}
                                 </div>

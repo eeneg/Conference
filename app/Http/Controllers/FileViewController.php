@@ -33,10 +33,23 @@ class FileViewController extends Controller
 
     public function referenceView($id){
 
-        $file = Reference::find($id);
+        $file = Reference::find($id)->only('hash_name');
+        $filePath = 'reference_files/' . $file['hash_name'];
 
-        $pdf = Storage::get('reference_files/'.$file['hash_name']);
+        if (!Storage::exists($filePath)) {
+            abort(404, 'File not found');
+        }
 
-        return base64_encode($pdf);
+        $fileStream = Storage::readStream($filePath);
+        $fileMimeType = Storage::mimeType($filePath);
+        $fileSize = Storage::size($filePath);
+
+        return Response::stream(function () use ($fileStream) {
+            fpassthru($fileStream);
+        }, 200, [
+            'Content-Type' => $fileMimeType,
+            'Content-Length' => $fileSize,
+            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"',
+        ]);
     }
 }

@@ -7,12 +7,12 @@ import TextInput from '../TextInput.vue';
 import InputError from '../InputError.vue';
 import Dropdown from '../Dropdown.vue';
 import FileComments from '../FileComments.vue';
-import { BarsArrowUpIcon, PaperClipIcon } from '@heroicons/vue/20/solid';
+import { BarsArrowUpIcon, CheckIcon, PaperClipIcon } from '@heroicons/vue/20/solid';
 import { ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import axios from 'axios';
 
-const props = defineProps({file_id:String, files:Object})
+const props = defineProps({file_id:String, files:Object, for_review:Boolean})
 
 const emit = defineEmits(['refreshData'])
 
@@ -116,8 +116,11 @@ const pdfModalShowClose = () => {
 <template>
    <div>
         <button @click="openFileVerionsModal">
-            <div class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer">
-                File Versions
+            <div v-if="!props.for_review" class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer">
+                <p>File Versions</p>
+            </div>
+            <div v-else class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400 hover:bg-indigo-500 text-black-900">
+                <BarsArrowUpIcon class="w-5 h-5 fill-white aria-hidden" aria-hidden="true" />
             </div>
         </button>
 
