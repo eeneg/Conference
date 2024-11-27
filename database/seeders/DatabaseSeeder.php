@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         \App\Models\User::factory()->create([
             'name' => 'admin',
-            'email' => 'admin@base.com',
+            'email' => 'admin@local.com',
             'password' => Hash::make('zxczxczxc')
         ]);
 
@@ -64,7 +64,7 @@ class DatabaseSeeder extends Seeder
             'details' => 'Philippine Laws (Edit as you see fit)'
         ]);
 
-        User::where('email', 'admin@base.com')->first()->roles()->attach(Role::where('title', 'administrator')->first()->id);
+        User::where('email', 'admin@local.com')->first()->roles()->attach(Role::where('title', 'administrator')->first()->id);
 
         \App\Models\User::factory()->count(90)->hasAttached(\App\Models\Role::where('title', 'user')->first())->create();
         \App\Models\User::factory()->count(10)->hasAttached(\App\Models\Role::where('title', 'board member')->first())->create();
