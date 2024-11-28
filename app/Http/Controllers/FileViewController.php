@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\File;
 use App\Models\Reference;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,44 +12,31 @@ class FileViewController extends Controller
 {
     public function fileView($id){
 
-        $file = File::find($id)->only('hash_name');
+        $file = File::find($id)->only(['id', 'hash_name']);
         $filePath = 'file_uploads/' . $file['hash_name'];
 
-        if (!Storage::exists($filePath)) {
-            abort(404, 'File not found');
+        $cacheKey = $file['id'];
+
+        if (Cache::has($cacheKey)) {
+            $cachedData = Cache::get($cacheKey);
+
+            return response($cachedData, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Length' => strlen($cachedData),
+                'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"',
+            ]);
         }
 
-        $fileStream = Storage::readStream($filePath);
-        $fileMimeType = Storage::mimeType($filePath);
-        $fileSize = Storage::size($filePath);
+        $stream = Storage::readStream($filePath);
+        $fileData = stream_get_contents($stream);
 
-        return Response::stream(function () use ($fileStream) {
-            fpassthru($fileStream);
-        }, 200, [
-            'Content-Type' => $fileMimeType,
-            'Content-Length' => $fileSize,
-            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"',
-        ]);
-    }
+        Cache::put($cacheKey, $fileData, now()->addMinutes(60));
 
-    public function referenceView($id){
+        fclose($stream);
 
-        $file = Reference::find($id)->only('hash_name');
-        $filePath = 'reference_files/' . $file['hash_name'];
-
-        if (!Storage::exists($filePath)) {
-            abort(404, 'File not found');
-        }
-
-        $fileStream = Storage::readStream($filePath);
-        $fileMimeType = Storage::mimeType($filePath);
-        $fileSize = Storage::size($filePath);
-
-        return Response::stream(function () use ($fileStream) {
-            fpassthru($fileStream);
-        }, 200, [
-            'Content-Type' => $fileMimeType,
-            'Content-Length' => $fileSize,
+        return response($fileData, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Length' => strlen($fileData),
             'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"',
         ]);
     }
