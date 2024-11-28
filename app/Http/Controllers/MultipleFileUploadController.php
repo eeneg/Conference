@@ -51,20 +51,12 @@ class MultipleFileUploadController extends Controller
     public function checkDuplicateFileName(Request $request){
 
         $request->validate([
-            'files' => 'required',
-            'files.*' => 'required|mimes:pdf',
+            'files_names' => 'required|array',
+            'files_names.*' => 'required|string',
             'storage_id' => 'required',
         ]);
 
-        $file_names = [];
-
-        foreach($request->files as $files){
-            foreach($files as $file){
-                array_push($file_names, $file->getClientOriginalName());
-            }
-        }
-
-        $files = File::whereIn('file_name', $file_names)->get('file_name');
+        $files = File::whereIn('file_name', $request->input('files_names'))->get('file_name');
 
         return $files;
     }

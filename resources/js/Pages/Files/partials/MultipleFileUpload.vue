@@ -2,11 +2,10 @@
 import InputLabel from '@/Components/InputLabel.vue';
 import { useForm } from '@inertiajs/vue3';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue'
 import InputError from '@/Components/InputError.vue';
 import Modal from '@/Components/Modal.vue';
 import { ref } from 'vue';
-import axios, { all } from 'axios';
+import axios from 'axios';
 import { XCircleIcon } from '@heroicons/vue/20/solid';
 import Combobox  from '@/Components/ComboBox.vue';
 
@@ -21,6 +20,7 @@ const modalShow = ref(false)
 const form = useForm({
     storage_id: null,
     category_id: [],
+    files_names: [],
     files: null
 })
 
@@ -29,6 +29,10 @@ const errors = ref({files: null, storage_id: null})
 const duplicates = ref([])
 
 const processFiles = (e) => {
+    form.files_names = Array.from(e.target.files).map((file) => {
+        return file.name
+    })
+
     form.files = e.target.files
 }
 
@@ -37,19 +41,16 @@ const resetDuplicateFileList = () => {
 }
 
 const duplicateCheck = () => {
-    axios.post(route('upload.check'), form, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    }).then((response) => {
+    axios.post(route('upload.check'), form)
+    .then((response) => {
         duplicates.value = response.data
-        console.log(duplicates.value)
         if(duplicates.value.length == 0){
             uploadFiles()
         }
-    }).catch((error) => {
-        errors.value.files = error.response.data.errors.files ? error.response.data.errors.files[0] : null
-        errors.value.storage_id = error.response.data.errors.storage_id ? error.response.data.errors.storage_id[0] : null
+    }).catch(error => {
+        console.log(error)
+        errors.value.files = error ? error?.response?.data?.errors?.files[0] : null
+        errors.value.storage_id = error ? error?.response?.data?.errors?.storage_id[0] : null
     })
 }
 
@@ -57,16 +58,21 @@ const uploadFiles = () => {
     form.post(route('multipleFileUpload.store'), {
         headers: {
             'Content-Type': 'multipart/form-data'
+        },
+        onSuccess: () => {
+            modalShow.value = true
+            header = "Success!"
+            success = true
+            form.reset()
+            message = "Files Uploaded Successfuly"
+            form.reset()
+        },
+        onError: (error) => {
+            modalShow.value = true
+            header = "Error!"
+            success = false
+            message = error.response.data.message
         }
-    }).then((response) => {
-        modalShow.value = true
-        header = "Success!"
-        success = true
-        form.reset()
-        message = "Files Uploaded Successfuly"
-        form.reset()
-    }).catch((error) => {
-        console.log(error)
     })
 }
 
@@ -76,6 +82,10 @@ const getCategoryId = (id) => {
 
 const removeCategoryId = (category) => {
     form.category_id.splice(category, 1)
+}
+
+const closeModal = () => {
+    modalShow.value = false
 }
 
 
@@ -150,19 +160,7 @@ const removeCategoryId = (category) => {
             </p>
 
             <div class="flex">
-                <div class="flex basis-full mt-2 space-x-2" v-if="editMode">
-                    <SecondaryButton
-                        class="w-full mt-2 place-content-center"
-                        @click="redirectBack()">
-                            <p>Back</p>
-                    </SecondaryButton>
-                    <PrimaryButton
-                        class="w-full mt-2 place-content-center"
-                        @click="closeModal">
-                            <p>OK</p>
-                    </PrimaryButton>
-                </div>
-                <div class="basis-full mt-2" v-else="editMode == false">
+                <div class="basis-full mt-2">
                     <PrimaryButton
                         class="w-full mt-2 place-content-center"
                         @click="closeModal">
