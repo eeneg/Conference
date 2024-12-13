@@ -17,6 +17,10 @@ class FileViewController extends Controller
 
         $cacheKey = $file['id'];
 
+        if(Storage::missing($filePath)){
+            return response()->json(['message' => 'File not found'], 404);
+        }
+
         if (Cache::has($cacheKey)) {
             $cachedData = Cache::get($cacheKey);
 

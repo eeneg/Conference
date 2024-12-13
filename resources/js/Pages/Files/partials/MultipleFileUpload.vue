@@ -49,8 +49,6 @@ const duplicateCheck = () => {
         }
     }).catch(error => {
         console.log(error)
-        errors.value.files = error ? error?.response?.data?.errors?.files[0] : null
-        errors.value.storage_id = error ? error?.response?.data?.errors?.storage_id[0] : null
     })
 }
 
@@ -71,7 +69,7 @@ const uploadFiles = () => {
             modalShow.value = true
             header = "Error!"
             success = false
-            message = error.response.data.message
+            message = "Something went wrong. Please try again."
         }
     })
 }
@@ -96,7 +94,7 @@ const closeModal = () => {
         <div>
             <InputLabel>Multiple Files</InputLabel>
             <input class="mb-3" type="file" @change="processFiles($event)" @click="resetDuplicateFileList()" multiple accept="application/pdf">
-            <InputError :message="errors.files" class="mt-2" />
+            <InputError :message="form.errors.files" class="mt-2" />
         </div>
         <div class="">
             <InputLabel>Storage Location</InputLabel>
@@ -104,7 +102,7 @@ const closeModal = () => {
                 <option :value="null" selected>---</option>
                 <option :value="storage.id" v-for="storage in props.storage">{{ storage.title.charAt(0).toUpperCase() + storage.title.slice(1) }}</option>
             </select>
-            <InputError :message="errors.storage_id" class="mt-2" />
+            <InputError :message="form.errors.storage_id" class="mt-2" />
         </div>
         <div class="flex flex-col">
             <div class="flex flex-row justify-between">

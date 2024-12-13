@@ -193,19 +193,55 @@ class FileController extends Controller
         $fv = FileVersionControl::where('file_id', $id)->first();
 
         if(FileVersionControl::where('control_id', $fv->control_id)->get()->count() > 1 && $f->latest == true){
-            $files = FileVersionControl::where('control_id', $fv->control_id)->get('file_id');
-            $files = File::whereIn('id', $files)->get()->map(fn($e) => 'file_uploads/'.$e->hash_name);
-            $delete = FileStorage::delete($files->toArray());
+            $fileVersions   = FileVersionControl::where('control_id', $fv->control_id)->get('file_id');
+            $files          = File::whereIn('id', $fileVersions)->get();
+            $filesToDelete  = $files->map(fn($e) => 'file_uploads/'.$e->hash_name);
+
+            $delteBlobFile      = FileStorage::delete($filesToDelete->toArray());
+            $deleteFileVersions = FileVersionControl::where('control_id', $fv->control_id)->delete();
+
+            foreach($files as $file){
+                $file->category()->detach();
+                $file->pdfContent()->delete();
+                $file->delete();
+            }
         }else{
             $fv->delete();
             FileStorage::delete('file_uploads/'.$f->hash_name);
+            $f->category()->detach();
+            $f->pdfContent()->delete();
+            $f->delete();
         }
 
-        $f->category()->detach();
 
-        $f->pdfContent()->delete();
+        return Redirect::route('file.index');
+    }
 
-        $f->delete();
+    public function deleteFiles(Request $request){
+
+        $request->validate([
+            'password' => ['required', 'current-password'],
+        ]);
+
+        $files = File::whereIn('id', $request->input('files'))->get();
+
+        foreach($files as $file){
+            $fv = FileVersionControl::where('file_id', $file->id)->first();
+
+            $versions = FileVersionControl::where('control_id', $fv->control_id);
+
+            if($versions->count() > 1 && $file->latest == true){
+                $related_files          = File::whereIn('id', $versions->get()->map(fn($e) => $e->file_id));
+                $delteBlobFile          = FileStorage::delete($related_files->get()->map(fn($e) => 'file_uploads/'.$e->hash_name)->toArray());
+                $delete_related_files   = $related_files->delete();
+                $deleteFileVersions     = $versions->delete();
+            }else{
+                $fv->delete();
+                FileStorage::delete('file_uploads/'.$file->hash_name);
+                $file->delete();
+            }
+
+        }
 
         return Redirect::route('file.index');
     }

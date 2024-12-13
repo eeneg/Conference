@@ -37,9 +37,16 @@ class MultipleFileUploadController extends Controller
     public function store(Request $request)
     {
 
+        $request->validate([
+            'files' => 'required|array',
+            'storage_id' => 'required',
+        ]);
+
         $files = Arr::map($request->file('files'), fn($e) => ['file_name' => $e->getClientOriginalName(), 'hash_name' => $e->hashName()]);
 
         $create = StorageModel::find($request->input('storage_id'))->files()->createMany($files);
+
+        $create->searchable();
 
         foreach($request->file('files') as $file){
             Storage::disk('local')->putFileAs('public/Temp_File_Storage/', $file, $file->hashName());
@@ -49,12 +56,6 @@ class MultipleFileUploadController extends Controller
     }
 
     public function checkDuplicateFileName(Request $request){
-
-        $request->validate([
-            'files_names' => 'required|array',
-            'files_names.*' => 'required|string',
-            'storage_id' => 'required',
-        ]);
 
         $files = File::whereIn('file_name', $request->input('files_names'))->get('file_name');
 

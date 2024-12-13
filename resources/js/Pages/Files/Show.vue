@@ -331,6 +331,34 @@
     const removeCategoryId = (category) => {
         fileForm.category_id.splice(category, 1)
     }
+
+    const clearSelected = () => {
+        selectedFiles.value = []
+    }
+
+    const deleteMultipleForm = useForm({
+        files: []
+    })
+    const deleteSelectedFiles = () => {
+        deleteMultipleForm.files = selectedFiles.value
+        deleteMultipleForm.submit('post', route('file.destroyMultiple'),{
+            onSuccess: (e) => {
+                header = 'Success'
+                message = 'Files Deleted Successfully'
+                success = true
+                responseModal.value = true
+                files.value = e.props.files
+                selectedFiles.value = []
+            },
+            onError: (e) => {
+                header = 'Error'
+                message = 'Somthing went wrong'
+                success = false
+                responseModal.value = true
+                files.value = e.props.files
+            }
+        })
+    }
 </script>
 <template>
 
@@ -349,16 +377,18 @@
             <div class="flex-none">
                 <div class="flex flex-col px-3">
                     <div class="text-wrap break-normal">
-                        <div>
+                        <div class="">
                             <p>Update Categories:</p>
-                            <ul class="px-4 mt-2">
-                                <li v-for="category in props.category">
-                                    <div class="flex">
-                                        <input type="checkbox" v-model="selectedCategory" :id="category.id" :value="category.id" class="mr-2 mt-[3px]"/>
-                                        <p>{{ category.title }}</p>
-                                    </div>
-                                </li>
-                            </ul>
+                            <div class="max-h-44 overflow-auto">
+                                <ul class="px-4 mt-2">
+                                    <li v-for="category in props.category">
+                                        <div class="flex max-w-32">
+                                            <input type="checkbox" v-model="selectedCategory" :id="category.id" :value="category.id" class="mr-2 mt-[3px]"/>
+                                            <p class="text-sm">{{ category.title }}</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="w-full">
                             <SecondaryButton @click="updateCategories()" class="mt-2">Save</SecondaryButton>
@@ -367,14 +397,16 @@
                     <div class="text-wrap break-normal mt-6">
                         <div>
                             <p>Transfer Storage:</p>
-                            <ul class="px-4 mt-2">
-                                <li v-for="storage in props.storage">
-                                    <div class="flex">
-                                        <input type="radio"  v-model="selectedStorage" id="storageCheckBox" :value="storage.id" class="mr-2 mt-[3px]"/>
-                                        <p>{{ storage.title }}</p>
-                                    </div>
-                                </li>
-                            </ul>
+                            <div class="max-h-44 overflow-auto">
+                                <ul class="px-4 mt-2">
+                                    <li v-for="storage in props.storage">
+                                        <div class="flex max-w-32">
+                                            <input type="radio"  v-model="selectedStorage" id="storageCheckBox" :value="storage.id" class="mr-2 mt-[3px]"/>
+                                            <p class="text-sm">{{ storage.title }}</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="w-full">
                             <SecondaryButton @click="updateStorage()" class="mt-2">Save</SecondaryButton>
@@ -431,7 +463,7 @@
                 </div>
                 <div class="grow pl-5 pr-5 text-sm mt-2 mb-4" v-if="for_review">
                     <Disclosure v-slot="{ open }">
-                        <DisclosureButton class="flex w-full justify-between rounded bg-indigo-100 px-4 py-2 text-left text-sm font-medium text-slate-900 hover:bg-indigo-200 focus:outline-none focus-visible:ring focus-visible:ring-indigo-500/75">
+                        <DisclosureButton class="flex w-full justify-between rounded bg-indigo-300 px-4 py-2 text-left text-sm font-medium text-slate-900 hover:bg-indigo-200 focus:outline-none focus-visible:ring focus-visible:ring-indigo-500/75">
                             <h2 class="text-lg font-bold float-left">For Review</h2>
                             <ChevronUpIcon
                                 :class="open ? 'rotate-180 transform' : ''"
@@ -477,14 +509,23 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="" v-if="for_review.length == 0">
+                                    <p class="ml-2 mt-2">No Files for Review</p>
+                                    <hr>
+                                </div>
                             </div>
                         </DisclosurePanel>
                     </Disclosure>
                 </div>
                 <div class="grow pl-5 pr-5 pb-40 text-sm min-h-20 max-h-screen overflow-auto" @scroll="onScroll" group="file">
-                    <div>
-                        <h2 class="text-lg font-bold">Files</h2>
-                        <hr>
+                    <div class="flex border rounded bg-indigo-300 px-4 py-2">
+                        <div class="flex-grow text-lg font-bold float-left">
+                            Files
+                        </div>
+                        <div class="flex-none space-x-2"  v-if="selectedFiles.length > 0">
+                            <DangerButton class="h-7" @click="deleteSelectedFiles">Delete Selected</DangerButton>
+                            <SecondaryButton class="h-7" @click="clearSelected">Clear Selection</SecondaryButton>
+                        </div>
                     </div>
                     <div class="pr-1 pl-1 mt-2 group">
                         <div class="flex flex-wrap">
@@ -625,7 +666,7 @@
             </div>
 
             <div class="mt-6 flex justify-between ">
-                <PrimaryButton @click="onStartForReview()">For Review</PrimaryButton>
+                <PrimaryButton @click="onStartForReview()" v-if="review_status">For Review</PrimaryButton>
                 <SecondaryButton @click="closeModal"> Close </SecondaryButton>
             </div>
         </div>

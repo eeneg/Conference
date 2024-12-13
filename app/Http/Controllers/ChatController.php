@@ -34,22 +34,38 @@ class ChatController extends Controller
 
     public function userChatList(){
 
-        $users = User::where('users.id', '!=', auth()->user()->id)
+        // $users = User::where('users.id', '!=', auth()->user()->id)
+        //     ->without('roles')
+        //     ->select('users.id', 'users.name', 'messages.sender_id', 'messages.recipient_id', 'messages.message', 'messages.read', 'messages.created_at')
+        //     ->leftJoin('messages', function(JoinClause $join){
+        //         $join->on('users.id', '=','messages.sender_id')
+        //             ->orOn('users.id', '=', 'messages.recipient_id');
+        //     })
+        //     ->where(function($query){
+        //         $query->where('messages.sender_id', auth()->user()->id)
+        //             ->orWhere('messages.recipient_id' , auth()->user()->id);
+        //     })
+        //     ->groupBy('users.id')
+        //     ->orderByDesc('messages.created_at')
+        //     ->paginate(10);
+
+        $chatRecords = User::where('users.id', '!=', auth()->user()->id)
             ->without('roles')
-            ->select('users.id', 'users.name', 'messages.sender_id', 'messages.recipient_id', 'messages.message', 'messages.read', 'messages.created_at')
-            ->leftJoin('messages', function(JoinClause $join){
-                $join->on('users.id', '=','messages.sender_id')
+            ->leftJoin('messages', function (JoinClause $join) {
+                $join->on('users.id', '=', 'messages.sender_id')
                     ->orOn('users.id', '=', 'messages.recipient_id');
             })
-            ->where(function($query){
+            ->where(function (Builder $query) {
                 $query->where('messages.sender_id', auth()->user()->id)
-                    ->orWhere('messages.recipient_id' , auth()->user()->id);
+                    ->orWhere('messages.recipient_id', auth()->user()->id)
+                    ->first();
             })
-            ->groupBy('users.id')
-            ->orderByDesc('messages.created_at')
+            // ->selectRaw('users.id, users.name, MAX(messages.created_at) as latest_message_time, messages.message, messages.read')
+            ->groupBy('users.id', 'users.name')
+            ->orderBy('latest_message_time')
             ->paginate(10);
 
-        return $users;
+        return $chatRecords;
 
     }
 

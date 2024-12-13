@@ -64,6 +64,8 @@ class DatabaseSeeder extends Seeder
             'details' => 'Philippine Laws (Edit as you see fit)'
         ]);
 
+        \App\Models\Category::factory()->count(20)->create();
+
         User::where('email', 'admin@local.com')->first()->roles()->attach(Role::where('title', 'administrator')->first()->id);
 
         // \App\Models\User::factory()->count(90)->hasAttached(\App\Models\Role::where('title', 'user')->first())->create();

@@ -69,6 +69,7 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::patch('/file_rename/{id}', [FileController::class, 'renameFile'])->name('file.rename');
     Route::patch('/file_review/{id}', [FileController::class, 'setFileForReview'])->name('file.review');
     Route::get('/file_check/{id}', [FileController::class, 'checkFile'])->name('file.check');
+    Route::post('/multipleFileDelete', [FileController::class, 'deleteFiles'])->name('file.destroyMultiple');
 
     Route::resource('multipleFileUpload', MultipleFileUploadController::class);
     Route::post('/checkDuplicateFileName', [MultipleFileUploadController::class, 'checkDuplicateFileName'])->name('upload.check');

@@ -40,6 +40,7 @@ class FileSearchController extends Controller
         $files = File::search($request->search)
             ->query(function($query) use ($request){
                 $query->where('latest', true)
+                    ->where('for_review', false)
                     ->with('storage')
                     ->with('category')
                     ->with('thumbnail')

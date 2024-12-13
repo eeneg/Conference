@@ -46,7 +46,7 @@
             onError: (e) => {
                 header = "Error!"
                 success = false
-                message = "Something went wrong"
+                message = "Something went wrong. Please try again."
                 modalShow.value = true
                 console.log(e)
             }
