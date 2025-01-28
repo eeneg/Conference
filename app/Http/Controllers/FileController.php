@@ -226,6 +226,7 @@ class FileController extends Controller
         $files = File::whereIn('id', $request->input('files'))->get();
 
         foreach($files as $file){
+
             $fv = FileVersionControl::where('file_id', $file->id)->first();
 
             $versions = FileVersionControl::where('control_id', $fv->control_id);

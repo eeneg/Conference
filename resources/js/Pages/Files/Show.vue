@@ -337,9 +337,21 @@
     }
 
     const deleteMultipleForm = useForm({
-        files: []
+        files: [],
+        password: null
     })
+
+    const confirmingMultipleFileDeletion = ref(false)
+    const closeMultipleFileDeletion = () => {
+        confirmingMultipleFileDeletion.value = false
+        deleteMultipleForm.password = null
+    }
+
     const deleteSelectedFiles = () => {
+        confirmingMultipleFileDeletion.value = true
+    }
+
+    const confirmMultipleFileDeletion = () => {
         deleteMultipleForm.files = selectedFiles.value
         deleteMultipleForm.submit('post', route('file.destroyMultiple'),{
             onSuccess: (e) => {
@@ -349,13 +361,13 @@
                 responseModal.value = true
                 files.value = e.props.files
                 selectedFiles.value = []
+                confirmingMultipleFileDeletion.value = false
             },
             onError: (e) => {
                 header = 'Error'
                 message = 'Somthing went wrong'
                 success = false
                 responseModal.value = true
-                files.value = e.props.files
             }
         })
     }
@@ -548,66 +560,68 @@
                                                 </div>
                                             </div>
                                             <div class="p-0">
-                                                <Dropdown class="absolute" align="right" width="48">
-                                                    <template #trigger>
-                                                        <button>
-                                                            <div class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-300 hover:bg-slate-400 text-black-900">
-                                                                <Bars3Icon class="w-4 h-4 fill-black aria-hidden" aria-hidden="true" />
-                                                            </div>
-                                                        </button>
-                                                    </template>
+                                                <div>
+                                                    <Dropdown class="absolute" align="right" width="48">
+                                                        <template #trigger>
+                                                            <button>
+                                                                <div class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-300 hover:bg-slate-400 text-black-900">
+                                                                    <Bars3Icon class="w-4 h-4 fill-black aria-hidden" aria-hidden="true" />
+                                                                </div>
+                                                            </button>
+                                                        </template>
 
-                                                    <template #content>
-                                                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
-                                                            <li>
-                                                                <div
-                                                                    class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
-                                                                    @click="fileEditModalOpen(file)"
-                                                                >
-                                                                    Edit
-                                                            </div>
-                                                            </li>
-                                                            <li>
-                                                                <a
-                                                                    class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
-                                                                    :href="'/downloadFile/'+file.id"
-                                                                >
-                                                                    Download
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <div
-                                                                    class="block w-full text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
-                                                                >
-                                                                    <FileComments :file_id="file.id" :for_review="false"/>
+                                                        <template #content>
+                                                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
+                                                                <li>
+                                                                    <div
+                                                                        class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
+                                                                        @click="fileEditModalOpen(file)"
+                                                                    >
+                                                                        Edit
                                                                 </div>
-                                                            </li>
-                                                            <li>
-                                                                <div
-                                                                    class="block w-full text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
-                                                                >
-                                                                    <FileVersioncontrol @refreshData="reloadLatest($event)" :file_id="file.id" :for_review="false"/>
-                                                                </div>
-                                                            </li>
-                                                            <li>
-                                                                <div
-                                                                    class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
-                                                                    @click="openRenameModal(file.id, file.file_name, i)"
-                                                                >
-                                                                    Rename
-                                                                </div>
-                                                            </li>
-                                                            <li>
-                                                                <div
-                                                                    class="block w-full px-4 py-1 text-left text-sm leading-5 text-red-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
-                                                                    @click="deleteFile(file.id)"
-                                                                >
-                                                                    Delete
-                                                                </div>
-                                                            </li>
-                                                        </ul>
-                                                    </template>
-                                                </Dropdown>
+                                                                </li>
+                                                                <li>
+                                                                    <a
+                                                                        class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
+                                                                        :href="'/downloadFile/'+file.id"
+                                                                    >
+                                                                        Download
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <div
+                                                                        class="block w-full text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
+                                                                    >
+                                                                        <FileComments :file_id="file.id" :for_review="false"/>
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div
+                                                                        class="block w-full text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
+                                                                    >
+                                                                        <FileVersioncontrol @refreshData="reloadLatest($event)" :file_id="file.id" :for_review="false"/>
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div
+                                                                        class="block w-full px-4 py-1 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
+                                                                        @click="openRenameModal(file.id, file.file_name, i)"
+                                                                    >
+                                                                        Rename
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div
+                                                                        class="block w-full px-4 py-1 text-left text-sm leading-5 text-red-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out cursor-pointer"
+                                                                        @click="deleteFile(file.id)"
+                                                                    >
+                                                                        Delete
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </template>
+                                                    </Dropdown>
+                                                </div>
                                             </div>
                                         </div>
                                         <div @click="viewFile(file)" class="flex group/item items-center justify-center rounded h-[10rem] bg-white/30 relative">
@@ -772,6 +786,49 @@
                     :class="{ 'opacity-25': deleteFileForm.processing }"
                     :disabled="deleteFileForm.processing"
                     @click="deleteFileConfirmed"
+                >
+                    Delete File
+                </DangerButton>
+            </div>
+        </div>
+    </Modal>
+
+    <Modal :show="confirmingMultipleFileDeletion" @close="closeMultipleFileDeletion">
+        <div class="p-6">
+            <h2 class="text-lg font-medium text-gray-900">
+                The selected files are from a previous conference and has older versions. <br>
+                Are you sure you want to delete it?
+            </h2>
+            <br>
+            <p class="mt-1 text-sm text-gray-600">
+                Once deleted, all resources and file versions will be permanently removed and no longer viewable in the conference view.
+                Please enter your password to confirm deletion.
+            </p>
+
+            <div class="mt-6">
+                <InputLabel for="password" value="Password" class="sr-only" />
+
+                <TextInput
+                    id="password"
+                    ref="passwordInput"
+                    v-model="deleteMultipleForm.password"
+                    type="password"
+                    class="mt-1 block w-3/4"
+                    placeholder="Password"
+                    @keyup.enter="confirmMultipleFileDeletion"
+                />
+
+                <InputError :message="deleteMultipleForm.errors.password" class="mt-2" />
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <SecondaryButton @click="closeMultipleFileDeletion"> Cancel </SecondaryButton>
+
+                <DangerButton
+                    class="ml-3"
+                    :class="{ 'opacity-25': deleteMultipleForm.processing }"
+                    :disabled="deleteMultipleForm.processing"
+                    @click="confirmMultipleFileDeletion"
                 >
                     Delete File
                 </DangerButton>
