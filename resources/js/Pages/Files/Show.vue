@@ -54,7 +54,7 @@
     }
 
     const form = useForm({
-        search: props.search,
+        search: null,
         storage: null,
         category: [],
         page: 1
@@ -67,9 +67,10 @@
     const search = () => {
         search_button_text.value = "LOADING..."
         form.page = 1
-        axios.get(route('file.search',form))
+        axios.get(route('file.index',form))
         .then(({data}) => {
             files.value = data
+            files.value.next_page_url = data.next_page_url
             search_button_text.value = "SEARCH"
         })
         .catch(e => {
@@ -79,15 +80,15 @@
 
     const searchFileOnScroll = () => {
         search_button_text.value = "LOADING..."
-        axios.get(route('file.search',form))
+        axios.get(route('file.index',form))
         .then(({data}) => {
             search_button_text.value = "SEARCH"
             if(data.data.length == 0){
                 form.page = form.page - 1
             }
-            data.data.forEach(e => {
-                files.value.data.push(e)
-            })
+            let m = new Set(files.value.data.concat(data.data))
+            files.value.data = [...m]
+            files.value.next_page_url = data.next_page_url
         })
         .catch(e => {
             search_button_text.value = "SEARCH"
@@ -96,7 +97,7 @@
     }
 
     const onScroll = _.debounce(({ target: { scrollTop, clientHeight, scrollHeight }}) => {
-        if ((form.search != null || form.storage || form.category != []) && scrollTop + clientHeight >= scrollHeight) {
+        if (files.value.next_page_url != null && (scrollTop + clientHeight >= scrollHeight)) {
             form.page = form.page + 1
             searchFileOnScroll()
         }
@@ -529,7 +530,7 @@
                         </DisclosurePanel>
                     </Disclosure>
                 </div>
-                <div class="grow pl-5 pr-5 pb-40 text-sm min-h-20 max-h-screen overflow-auto" @scroll="onScroll" group="file">
+                <div class="grow pl-5 pr-5 pb-40 text-sm min-h-20 max-h-[42rem] overflow-auto" @scroll="onScroll" group="file">
                     <div class="flex border rounded bg-indigo-300 px-4 py-2">
                         <div class="flex-grow text-lg font-bold float-left">
                             Files
@@ -541,7 +542,7 @@
                     </div>
                     <div class="pr-1 pl-1 mt-2 group">
                         <div class="flex flex-wrap">
-                            <div class="basis-1/4 py-3 px-2" v-for="(file, i) in files.data">
+                            <div class="basis-1/4 py-3 px-2" v-for="(file, i) in files.data" :key="file.id">
                                 <div
                                     class="border rounded py-2 px-4 max-w-[18rem] h-[18rem] hover:bg-slate-300 cursor-pointer"
                                     :class="[file.processed == false ? 'bg-yellow-200' : file.file_error ? 'bg-red-200' : 'bg-slate-200']"

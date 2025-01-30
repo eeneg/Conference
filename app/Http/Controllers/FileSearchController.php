@@ -14,29 +14,8 @@ use Throwable;
 
 class FileSearchController extends Controller
 {
-    public function index(){
-        return Inertia::render('Files/Show', [
-            'files' => File::where('latest', true)
-                ->where('for_review', false)
-                ->with('category')
-                ->with('storage')
-                ->with('thumbnail')
-                ->with('fileError')
-                ->orderBy('created_at', 'desc')
-                ->paginate(15),
-            'for_review' => File::where('latest', true)
-                ->where('for_review', true)
-                ->with('category')
-                ->with('storage')
-                ->orderBy('created_at', 'desc')
-                ->get(),
-            'storage' => Storage::all(),
-            'category' => Category::where("type", "1")->get(),
-        ]);
-    }
+    public function index(Request $request){
 
-    public function searchFile(Request $request)
-    {
         $files = File::search($request->search)
             ->query(function($query) use ($request){
                 $query->where('latest', true)
@@ -56,7 +35,21 @@ class FileSearchController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
-        return $files;
+        if($request->wantsJson()){
+            return $files;
+        }
+
+        return Inertia::render('Files/Show', [
+            'files' => $files,
+            'for_review' => File::where('latest', true)
+                ->where('for_review', true)
+                ->with('category')
+                ->with('storage')
+                ->orderBy('created_at', 'desc')
+                ->get(),
+            'storage' => Storage::all(),
+            'category' => Category::where("type", "1")->get(),
+        ]);
     }
 
     public function searchFileAsAttachment(Request $request){
@@ -71,7 +64,7 @@ class FileSearchController extends Controller
     }
 
     public function downloadFile(File $file){
-        return StorageDownload::download('file_uploads/'.$file->hash_name, $file->file_name);
+        return StorageDownload::download('test_uploads/'.$file->hash_name, $file->file_name);
     }
 
 }
