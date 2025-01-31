@@ -73,6 +73,20 @@
         })
     }
 
+    const searchGroups = (page, search) => {
+        // axios.get('/groupsToChat?page='+page+'&search='+search)
+        // .then(({data}) => {
+        //     data.data.forEach(e => {
+        //         users.value.push(e)
+        //     })
+        //     showLoading.value = false
+        // })
+        // .catch(e =>{
+        //     console.log(e)
+        //     console.log('Something Went Wrong!')
+        // })
+    }
+
     const searchUserFunction = _.debounce(function(){
         users.value = []
         if(search.value){
@@ -95,8 +109,10 @@
         modeMessageList.value = mode
         if(mode == 1){
             getUsersChatList(1)
-        }else{
+        }else if(mode == 2){
             searchUsers(1, search.value)
+        }else if(mode == 3){
+            searchGroups()
         }
     }
 
@@ -124,9 +140,10 @@
         <div class="flex w-full p-2">
             <TextInput class="w-full rounded" placeholder="Search..." @input="searchUserFunction()" v-model="search"></TextInput>
         </div>
-        <div class="flex flex-row w-full space-x-3 p-2">
-            <button @click="navigate(1)" class="rounded rounded-full px-2 py-1 uppercase border-2 text-xs text-white bg-gray-800" :class="{'border-2 border-indigo-600 bg-indigo-800' : modeMessageList == 1}">Messages</button>
-            <button @click="navigate(2)" class="rounded rounded-full px-2 py-1 uppercase border-2 text-xs text-white bg-gray-800" :class="{'border-2 border-indigo-600 bg-indigo-800' : modeMessageList == 2}">Contacts</button>
+        <div class="flex flex-row w-full space-x-1 p-2">
+            <button @click="navigate(1)" class="rounded rounded-full w-[6rem] py-1 uppercase border-2 text-xs text-white bg-gray-800" :class="{'border-2 border-indigo-600 bg-indigo-800' : modeMessageList == 1}">Messages</button>
+            <button @click="navigate(2)" class="rounded rounded-full w-[6rem] py-1 uppercase border-2 text-xs text-white bg-gray-800" :class="{'border-2 border-indigo-600 bg-indigo-800' : modeMessageList == 2}">Contacts</button>
+            <button @click="navigate(3)" class="rounded rounded-full w-[6rem] py-1 uppercase border-2 text-xs text-white bg-gray-800" :class="{'border-2 border-indigo-600 bg-indigo-800' : modeMessageList == 3}">Groups</button>
         </div>
         <div id="userChatList" class="flex w-full mt-2 flex-col overflow-auto" ref="userChatList" v-on:scroll="onScroll($event)">
             <div v-for="user in users" type="button" class="w-full hover:bg-indigo-700 hover:text-white rounded p-2 cursor-pointer" @click="goToChat(user.id, user.name)">

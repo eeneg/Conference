@@ -96,7 +96,7 @@ class FileVersionController extends Controller
 
         $f = File::find($id);
 
-        FileStorage::delete('file_uploads/'.$f->hash_name);
+        FileStorage::delete(env('UPLOAD_LOCATION').$f->hash_name);
 
         $f->category()->detach();
 

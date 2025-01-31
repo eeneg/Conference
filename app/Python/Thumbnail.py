@@ -6,7 +6,7 @@ from io import BytesIO
 
 class thumbnail:
 
-    pdf = '/var/www/html/conference/storage/app/public/'+sys.argv[1]
+    pdf = '/var/www/html/storage/app/public/'+sys.argv[1]
     pdf_info = pdfinfo_from_path(pdf, userpw=None, poppler_path=None)
     image = convert_from_path(pdf, first_page=1, last_page=1)[0]
     width, height = image.size

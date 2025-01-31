@@ -10,6 +10,5 @@ class Chat extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['id1', 'id2', 'latest_message_id'];
-
+    protected $fillable = ['participant1_id', 'participant2_id', 'latest_message_id'];
 }

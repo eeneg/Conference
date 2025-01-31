@@ -69,6 +69,8 @@ class File extends Model
             'details' => $this->details,
             'date' => $this->date,
             'content' => $this->pdfContent->content ?? '',
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

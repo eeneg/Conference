@@ -65,7 +65,7 @@ class ProcessFileContent implements ShouldQueue
         $pdf = Storage::disk('local')->get('public/Temp_File_Storage/'.$file->hash_name);
 
         try{
-            $upload = Storage::put('file_uploads/'.$file->hash_name, $pdf);
+            $upload = Storage::put(env('UPLOAD_LOCATION').$file->hash_name, $pdf);
         }catch(Exception $e){
             File::find($file->file_id)->fileError()->create(['verbose' => $e, 'remark' => 'File upload to blob failed']);
         }

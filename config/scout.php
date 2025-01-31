@@ -152,7 +152,7 @@ return [
                     'date',
                     'content',
                 ],
-                'sortableAttributes' => ['id', 'title', 'created_at'],
+                'sortableAttributes' => ['created_at'],
             ],
         ],
     ],

@@ -13,7 +13,7 @@ class FileViewController extends Controller
     public function fileView($id){
 
         $file = File::find($id)->only(['id', 'hash_name']);
-        $filePath = 'file_uploads/' . $file['hash_name'];
+        $filePath = env('UPLOAD_LOCATION') . $file['hash_name'];
 
         $cacheKey = $file['id'];
 

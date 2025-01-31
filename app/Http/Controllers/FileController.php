@@ -195,7 +195,7 @@ class FileController extends Controller
         if(FileVersionControl::where('control_id', $fv->control_id)->get()->count() > 1 && $f->latest == true){
             $fileVersions   = FileVersionControl::where('control_id', $fv->control_id)->get('file_id');
             $files          = File::whereIn('id', $fileVersions)->get();
-            $filesToDelete  = $files->map(fn($e) => 'file_uploads/'.$e->hash_name);
+            $filesToDelete  = $files->map(fn($e) => env('UPLOAD_LOCATION').$e->hash_name);
 
             $delteBlobFile      = FileStorage::delete($filesToDelete->toArray());
             $deleteFileVersions = FileVersionControl::where('control_id', $fv->control_id)->delete();
@@ -207,7 +207,7 @@ class FileController extends Controller
             }
         }else{
             $fv->delete();
-            FileStorage::delete('file_uploads/'.$f->hash_name);
+            FileStorage::delete(env('UPLOAD_LOCATION').$f->hash_name);
             $f->category()->detach();
             $f->pdfContent()->delete();
             $f->delete();
@@ -232,13 +232,15 @@ class FileController extends Controller
             $versions = FileVersionControl::where('control_id', $fv->control_id);
 
             if($versions->count() > 1 && $file->latest == true){
+                $file->category()->detach();
                 $related_files          = File::whereIn('id', $versions->get()->map(fn($e) => $e->file_id));
-                $delteBlobFile          = FileStorage::delete($related_files->get()->map(fn($e) => 'file_uploads/'.$e->hash_name)->toArray());
+                $delteBlobFile          = FileStorage::delete($related_files->get()->map(fn($e) => env('UPLOAD_LOCATION').$e->hash_name)->toArray());
                 $delete_related_files   = $related_files->delete();
                 $deleteFileVersions     = $versions->delete();
             }else{
                 $fv->delete();
-                FileStorage::delete('file_uploads/'.$file->hash_name);
+                FileStorage::delete(env('UPLOAD_LOCATION').$file->hash_name);
+                $file->category()->detach();
                 $file->delete();
             }
 

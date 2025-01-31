@@ -49,6 +49,26 @@ class ChatController extends Controller
         //     ->orderByDesc('messages.created_at')
         //     ->paginate(10);
 
+        // $chatRecords = User::where('users.id', '!=', auth()->user()->id)
+        //     ->without('roles')
+        //     ->leftJoin('messages', function (JoinClause $join) {
+        //         $join->on('users.id', '=', 'messages.sender_id')
+        //             ->orOn('users.id', '=', 'messages.recipient_id');
+        //     })
+        //     ->where(function (Builder $query) {
+        //         $query->where('messages.sender_id', auth()->user()->id)
+        //             ->orWhere('messages.recipient_id', auth()->user()->id);
+        //             // ->first();
+        //     })
+        //     ->selectRaw('users.id, users.name, MAX(messages.created_at) as latest_message_time, messages.message, messages.read')
+        //     ->groupBy('users.id', 'users.name')
+        //     ->orderBy('latest_message_time')
+        //     ->paginate(10);
+
+        // $chatRecords = User::paginate(10);
+
+        // dd($chatRecords->toArray());
+
         $chatRecords = User::where('users.id', '!=', auth()->user()->id)
             ->without('roles')
             ->leftJoin('messages', function (JoinClause $join) {
@@ -57,15 +77,16 @@ class ChatController extends Controller
             })
             ->where(function (Builder $query) {
                 $query->where('messages.sender_id', auth()->user()->id)
-                    ->orWhere('messages.recipient_id', auth()->user()->id)
-                    ->first();
+                    ->orWhere('messages.recipient_id', auth()->user()->id);
             })
-            // ->selectRaw('users.id, users.name, MAX(messages.created_at) as latest_message_time, messages.message, messages.read')
+            ->selectRaw('users.id, users.name, MAX(messages.created_at) as latest_message_time, messages.message, messages.read')
             ->groupBy('users.id', 'users.name')
             ->orderBy('latest_message_time')
             ->paginate(10);
 
         return $chatRecords;
+
+        return $users;
 
     }
 
@@ -84,10 +105,31 @@ class ChatController extends Controller
     }
 
     public function store(Request $request){
+
         $message = User::find(auth()->user()->id)->messages()->create([
             'recipient_id' => $request->recipient_id,
             'message' => $request->message
         ]);
+
+        $check_chat_record = Chat::where('participant1_id', auth()->user()->id)
+            ->where('participant2_id', $request->recipient_id)
+            ->orWhere(function($query) use ($request){
+                $query->where('participant1_id', $request->recipient_id)
+                    ->where('participant2_id', auth()->user()->id);
+            })
+            ->first();
+
+        if($check_chat_record){
+            $check_chat_record->update([
+                'latest_message_id' => $message->id
+            ]);
+        }else{
+            $chats = Chat::create([
+                'participant1_id' => auth()->user()->id,
+                'participant2_id' => $request->recipient_id,
+                'latest_message_id' => $message->id
+            ]);
+        }
 
         broadcast(new MessageSentEvent(auth()->user()->id, $request->recipient_id, $message))->toOthers();
 

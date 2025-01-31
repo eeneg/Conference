@@ -107,6 +107,7 @@
         form.reset()
         combobox.value = []
         router.visit(route('file.index'),{
+            only: ['files'],
             onStart: e => loading.value = true,
             onSuccess: e => loading.value = false
         })
@@ -544,7 +545,7 @@
                         <div class="flex flex-wrap">
                             <div class="basis-1/4 py-3 px-2" v-for="(file, i) in files.data" :key="file.id">
                                 <div
-                                    class="border rounded py-2 px-4 max-w-[18rem] h-[18rem] hover:bg-slate-300 cursor-pointer"
+                                    class="border rounded py-2 px-4 min-w-[16rem] w-[16rem] h-[18rem] max-w-[18rem] hover:bg-slate-300 cursor-pointer"
                                     :class="[file.processed == false ? 'bg-yellow-200' : file.file_error ? 'bg-red-200' : 'bg-slate-200']"
                                 >
                                     <div class="flex flex-col space-y-3">
@@ -625,7 +626,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div @click="viewFile(file)" class="flex group/item items-center justify-center rounded h-[10rem] bg-white/30 relative">
+                                        <div @click="viewFile(file)" class="flex group/item items-center justify-center rounded w-[13.8rem] max-w-[13.8rem] h-[10rem] max-h-[10rem] bg-white/30 relative">
                                             <img class="group-hover/item:scale-75 transition ease-in-out" :src="'data:image/png;base64,'+file.thumbnail?.base64_thumbnail" alt="">
                                             <EyeIcon class="h-8 w-8 absolute fill-none stroke-slate-900 stroke-1 invisible group-hover/item:visible"/>
                                         </div>
@@ -719,7 +720,7 @@
             <div class="flex flex-col mt-4">
                 <div class="basis-full">
                     <InputLabel for="file_name">File Name</InputLabel>
-                    <TextInput name="file_name" id="file_name" class="w-full" v-model="file.file_name"/>
+                    <TextInput name="file_name" id="file_name" class="w-full" v-model="renameForm.file_name"/>
                     <InputError :message="renameForm.errors.file_name" class="mt-2" />
                     <Transition enter-from-class="opacity-0" leave-to-class="opacity-0" class="transition ease-in-out float-right">
                         <p v-if="renameForm.recentlySuccessful" class="text-sm text-gray-600">Saved.</p>

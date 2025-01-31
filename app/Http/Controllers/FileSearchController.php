@@ -17,23 +17,23 @@ class FileSearchController extends Controller
     public function index(Request $request){
 
         $files = File::search($request->search)
-            ->query(function($query) use ($request){
-                $query->where('latest', true)
-                    ->where('for_review', false)
-                    ->with('storage')
-                    ->with('category')
-                    ->with('thumbnail')
-                    ->when($request->storage, function($query) use ($request){
-                        $query->where('storage_id', $request->storage);
-                    })
-                    ->when($request->category, function($query) use ($request){
-                        $query->whereHas('category', function($query) use ($request){
-                            $query->whereIn('categories.id', $request->category);
-                        });
-                    });
+        ->orderBy('created_at', 'desc')
+        ->query(function($query) use ($request){
+            $query->where('latest', true)
+            ->where('for_review', false)
+            ->with('storage')
+            ->with('category')
+            ->with('thumbnail')
+            ->when($request->storage, function($query) use ($request){
+                $query->where('storage_id', $request->storage);
             })
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+            ->when($request->category, function($query) use ($request){
+                $query->whereHas('category', function($query) use ($request){
+                    $query->whereIn('categories.id', $request->category);
+                });
+            });
+        })
+        ->paginate(15);
 
         if($request->wantsJson()){
             return $files;
@@ -64,7 +64,7 @@ class FileSearchController extends Controller
     }
 
     public function downloadFile(File $file){
-        return StorageDownload::download('test_uploads/'.$file->hash_name, $file->file_name);
+        return StorageDownload::download(env('UPLOAD_LOCATION').$file->hash_name, $file->file_name);
     }
 
 }

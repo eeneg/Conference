@@ -8,9 +8,6 @@ use App\Jobs\ProcessThumbnail;
 use Illuminate\Support\Facades\Bus;
 
 class FileContentService {
-
-
-
     public function handle($id){
         $file = File::find($id);
         Bus::chain([
