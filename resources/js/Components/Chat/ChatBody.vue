@@ -22,7 +22,6 @@
         showLoading.value = true
         axios.get('/messages/'+props.recipient_id+'?page='+page)
         .then(({data}) => {
-
             if(data.data.length > 0){
                 transformData(data.data)
             }
@@ -52,7 +51,7 @@
     }, 200)
 
     const transformData = (data) => {
-        let groupedMessages = data.reduce((acc, curr) => {
+        let groupedMessages = data[0].messages.reduce((acc, curr) => {
             let lastGroup = acc[acc.length - 1];
             if (lastGroup && lastGroup[0].sender_id === curr.sender_id) {
                 lastGroup.push(curr);
@@ -61,6 +60,8 @@
             }
             return acc;
         }, []);
+
+        console.log(groupedMessages)
 
         messages.value.push(...groupedMessages);
     }

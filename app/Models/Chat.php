@@ -10,5 +10,23 @@ class Chat extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['participant1_id', 'participant2_id', 'latest_message_id'];
+    protected $fillable = ['title', 'private'];
+
+    public function user(){
+        return $this->belongsToMany(User::class);
+    }
+
+    public function messages(){
+        return $this->hasMany(Message::class);
+    }
+
+    public function latestMessage(){
+        return $this->hasOne(Message::class)->latestOfMany();
+    }
+
+    public function userChats()
+    {
+        return $this->hasMany(UserChat::class);
+    }
+
 }

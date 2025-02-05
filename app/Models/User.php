@@ -71,23 +71,23 @@ class User extends Authenticatable
         return $this->hasOne(Note::class);
     }
 
-    public function messages()
+    public function chat()
     {
-        return $this->hasMany(Message::class, 'sender_id')->orderBy('created_at');
+        return $this->belongsToMany(Chat::class, 'user_chat', 'user_id', 'chat_id')->using(UserChat::class);
     }
 
-    public function latestMessage()
-    {
-        return $this->hasOne(Message::class)
-            ->ofMany([
-                'created_at' => 'max',
-            ], function (Builder $query) {
-                $query->where('messages.sender_id', '=', auth()->user()->id)
-                    ->orWhere('messages.receiver_id', '=', auth()->user()->id);
-            });
+    // public function latestMessage()
+    // {
+    //     return $this->hasOne(Message::class)
+    //         ->ofMany([
+    //             'created_at' => 'max',
+    //         ], function (Builder $query) {
+    //             $query->where('messages.sender_id', '=', auth()->user()->id)
+    //                 ->orWhere('messages.receiver_id', '=', auth()->user()->id);
+    //         });
 
-        // return $this->hasOne(Message::class)->latestOfMany();
-    }
+    //     // return $this->hasOne(Message::class)->latestOfMany();
+    // }
 
 
     public function toSearchableArray(): array

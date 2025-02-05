@@ -17,6 +17,8 @@
 
     const search = ref("")
 
+    const navLocation = ref(1)
+
     const emit = defineEmits(['navChat'])
 
     const goToChat = (id, name) =>{
@@ -52,7 +54,15 @@
         axios.get('/userChatList?page='+page)
         .then(({data}) => {
             data.data.forEach(e => {
-                users.value.push(e)
+                users.value.push(
+                    {
+                        id: e.id,
+                        name: e.latest_message.user.name,
+                        message: e.latest_message.message,
+                        read: e.latest_message.read,
+                    }
+                )
+                console.log(e)
             })
             showLoading.value = false
         })
@@ -89,10 +99,12 @@
 
     const searchUserFunction = _.debounce(function(){
         users.value = []
-        if(search.value){
-            searchUsers(1, search.value)
-        }else{
+        if(navLocation.value == 1){
             getUsersChatList(1)
+        }else if(navLocation.value == 2){
+            searchUsers(1, search.value)
+        }else if(navLocation.value == 3){
+            searchGroups()
         }
     }, 300)
 
@@ -108,10 +120,13 @@
         users.value = []
         modeMessageList.value = mode
         if(mode == 1){
+            navLocation.value = 1
             getUsersChatList(1)
         }else if(mode == 2){
+            navLocation.value = 2
             searchUsers(1, search.value)
         }else if(mode == 3){
+            navLocation.value = 3
             searchGroups()
         }
     }
