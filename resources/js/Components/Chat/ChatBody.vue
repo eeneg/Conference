@@ -61,8 +61,6 @@
             return acc;
         }, []);
 
-        console.log(groupedMessages)
-
         messages.value.push(...groupedMessages);
     }
 

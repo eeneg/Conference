@@ -31,14 +31,18 @@ class ChatController extends Controller
 
     public function userChatList(){
 
-        $chats = Chat::with(['latestMessage' => fn ($q) => $q->with(['user', 'recipient'])])
+        $chats = Chat::with(['latestMessage' => fn ($q) => $q->with(['recipient'])])
             ->whereHas('userChats', function ($query) {
                 $query->where('user_id', auth()->id());
             })
             ->where('private', true)
-            ->paginate(10);
-
-        // dd($chats->toArray());
+            ->orderByDesc(
+                Message::select('created_at')
+                ->whereColumn('messages.chat_id', 'chats.id')
+                ->latest()
+                ->limit(1)
+            )
+            ->paginate();
 
         return $chats;
 
@@ -48,7 +52,7 @@ class ChatController extends Controller
     {
 
         $message = Chat::with(['messages' => function($query){
-            $query->orderBy('created_at', 'desc');
+                $query->orderBy('created_at', 'desc');
             }])
             ->whereHas('userChats', function ($query) {
                 $query->where('user_id', auth()->id());
@@ -98,8 +102,36 @@ class ChatController extends Controller
     }
 
     public function setMessageStatus(Request $request){
+        $chat = Chat::with('messages')
+            ->whereHas('userChats', function ($query) {
+                $query->where('user_id', auth()->id());
+            })
+            ->whereHas('userChats', function ($query) use ($request) {
+                $query->where('user_id', $request->id);
+            })
+            ->first();
+
+            $chat->messages()->where('read', false)->whereNot('sender_id', auth()->id())->where('chat_id', $chat->id)->update(['read' => true]);
     }
 
     public function newMessageCount(Request $request){
+        $count = 0;
+        $chat = Chat::with(['messages' => function($query){
+                $query->where('read', false)
+                ->where('sender_id', '!=', auth()->id());
+            }])
+            ->whereHas('userChats', function ($query) {
+                $query->where('user_id', auth()->id());
+            })
+            ->get()
+            ->map(function($chat){
+                return $chat->messages->count();
+            });
+
+        foreach($chat as $c){
+            $count += $c;
+        }
+
+        return $count;
     }
 }

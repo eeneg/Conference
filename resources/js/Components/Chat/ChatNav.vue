@@ -56,13 +56,13 @@
             data.data.forEach(e => {
                 users.value.push(
                     {
-                        id: e.id,
-                        name: e.latest_message.user.name,
+                        id: e.latest_message.recipient.id,
+                        name: e.latest_message.recipient.name,
                         message: e.latest_message.message,
+                        sender_id: e.latest_message.sender_id,
                         read: e.latest_message.read,
                     }
                 )
-                console.log(e)
             })
             showLoading.value = false
         })
@@ -75,7 +75,18 @@
     const updateChatList = () => {
         axios.get('/userChatList?page='+1)
         .then(({data}) => {
-            users.value = data.data
+            users.value = []
+            data.data.forEach(e => {
+                users.value.push(
+                    {
+                        id: e.latest_message.recipient.id,
+                        name: e.latest_message.recipient.name,
+                        message: e.latest_message.message,
+                        sender_id: e.latest_message.sender_id,
+                        read: e.latest_message.read,
+                    }
+                )
+            })
         })
         .catch(e =>{
             console.log(e)
@@ -170,7 +181,7 @@
                     </div>
                     <div class="flex flex-col w-full pr-2">
                         <div class=""><p class="float-left font-bold">{{ user.name }}</p></div>
-                        <div class="text-sm w-full" :class="{'font-bold text-lg dark:text-black-400' : user.read == false && user.sender_id != id, 'dark:text-black-400' : user.sender_id == id}">
+                        <div class="text-sm w-full" :class="{'font-bold text-lg dark:text-black-400' : user.read == false && user.sender_id != id, 'dark:text-black-400' : user.read == true && user.sender_id == id}">
                             <p class="float-left truncate w-24">{{user.message == undefined ? '' : user.message}}</p>
                         </div>
                     </div>
