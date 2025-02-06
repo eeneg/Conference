@@ -25,12 +25,8 @@ class Message extends Model
 
     public function recipient() : HasOneThrough
     {
-        return
-            (
-                $this->hasOneThrough(User::class, Message::class, 'users.id', 'messages.sender_id', null, 'messages.sender_id')
-                ->join('user_chats', 'user_chats.chat_id', '=', 'messages.chat_id')
-
-            )
-            ;
+        return $this->hasOneThrough(User::class, UserChat::class, 'messages.id', 'users.id', null, 'user_chats.user_id')
+            ->join('messages', 'messages.chat_id', '=', 'user_chats.chat_id')
+            ->whereNot('user_chats.user_id', auth()->id());
     }
 }
