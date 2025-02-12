@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\File;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
@@ -67,6 +69,8 @@ class DatabaseSeeder extends Seeder
         \App\Models\Category::factory()->count(20)->create();
 
         User::where('email', 'admin@local.com')->first()->roles()->attach(Role::where('title', 'administrator')->first()->id);
+
+        File::factory()->count(100)->create();
 
         // \App\Models\User::factory()->count(90)->hasAttached(\App\Models\Role::where('title', 'user')->first())->create();
         // \App\Models\User::factory()->count(10)->hasAttached(\App\Models\Role::where('title', 'board member')->first())->create();
